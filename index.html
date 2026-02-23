@@ -228,132 +228,6 @@ for(let i=0;i<10;i++){const p=document.createElement('div');p.className='particl
   </div>
 
   <!-- LOGIN MODAL -->
-  <div class="modal-overlay hidden" id="modr(--border);border-radius:3px;}
-.msg{display:flex;gap:10px;align-items:flex-end;max-width:72%;}
-.msg.own{align-self:flex-end;flex-direction:row-reverse;}
-.msg.system{align-self:center;max-width:100%;}
-.msg-avatar .avatar{width:34px;height:34px;font-size:0.75rem;}
-.msg-bubble{background:linear-gradient(160deg,var(--dark3),var(--dark4));border:1px solid var(--border);border-radius:48% 48% 8px 8px/18% 18% 8px 8px;padding:16px 14px 10px;max-width:100%;position:relative;cursor:pointer;transition:border-color 0.2s;}
-.msg-bubble:hover{border-color:var(--border2);}
-.msg.own .msg-bubble{background:linear-gradient(160deg,rgba(139,105,20,0.22),rgba(80,58,8,0.28));border-color:rgba(201,168,76,0.35);}
-.msg.system .msg-bubble{background:rgba(201,168,76,0.05);border-color:var(--border);border-radius:20px;padding:6px 20px;text-align:center;cursor:default;}
-.msg-bubble::after{content:'✦';position:absolute;top:4px;right:8px;font-size:0.45rem;color:var(--gold3);opacity:0.5;}
-.msg.system .msg-bubble::after{display:none;}
-.msg-author{font-family:'Amiri',serif;font-size:0.82rem;color:var(--gold);margin-bottom:4px;font-weight:700;}
-.msg-text{font-size:0.9rem;line-height:1.6;word-break:break-word;}
-.msg.system .msg-text{font-size:0.78rem;color:var(--text2);font-style:italic;font-family:'Amiri',serif;}
-.msg-time{font-size:0.65rem;color:var(--text2);margin-top:6px;text-align:right;}
-.msg-translation{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.82rem;color:var(--text2);line-height:1.6;font-style:italic;display:none;}
-.msg-translation.show{display:block;}
-.translate-hint{font-size:0.65rem;color:var(--gold3);margin-top:4px;opacity:0.7;}
-.msg-img{max-width:260px;max-height:260px;border-radius:8px 8px 4px 4px;display:block;margin-top:8px;cursor:pointer;border:1px solid var(--border);}
-.chat-input-area{background:rgba(8,5,1,0.98);border-top:1px solid var(--border);padding:16px 20px;flex-shrink:0;}
-.chat-input-row{display:flex;gap:10px;align-items:flex-end;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;}
-.chat-input-row:focus-within{border-color:var(--gold);}
-#msg-input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Lora',serif;font-size:0.9rem;resize:none;outline:none;max-height:120px;min-height:36px;line-height:1.5;padding-top:4px;}
-#msg-input::placeholder{color:var(--text2);font-style:italic;}
-.img-upload-btn{background:none;border:none;cursor:pointer;color:var(--gold3);font-size:1.3rem;padding:4px 6px;transition:color 0.2s;}
-.img-upload-btn:hover{color:var(--gold);}
-.send-btn{background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:50%;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--dark);font-size:1.1rem;transition:all 0.2s;flex-shrink:0;}
-.send-btn:hover{transform:scale(1.1);box-shadow:0 0 14px rgba(201,168,76,0.4);}
-.image-preview-wrap{display:none;padding:8px 0;position:relative;width:fit-content;}
-.image-preview-wrap.show{display:block;}
-.image-preview-thumb{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--border2);}
-.remove-preview{position:absolute;top:-6px;right:-6px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:0.65rem;display:flex;align-items:center;justify-content:center;}
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.93);display:flex;align-items:center;justify-content:center;z-index:300;cursor:zoom-out;backdrop-filter:blur(10px);}
-.lightbox.hidden{display:none;}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;border:1px solid var(--border2);}
-.page{display:none;}.page.active{display:block;}#page-chat.active{display:flex;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(201,168,76,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:4px;}
-@media(max-width:600px){header{padding:0 10px;}.header-center{display:none;}#page-home{padding:16px 12px;}.msg{max-width:90%;}.messages-area{padding:12px;}.chat-input-area{padding:10px;}.hero-arch{padding:20px 24px;}}
-</style>
-</head>
-<body>
-<script>
-for(let i=0;i<10;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*4+2;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*15}s;`;document.body.appendChild(p);}
-</script>
-<div id="app">
-  <header>
-    <div class="logo" onclick="navigate('home')">مجلس<span class="logo-sub">The Arabian Gathering</span></div>
-    <div class="header-center">
-      <div class="hijri-date" id="hijri-date"></div>
-      <div class="lang-toggle">
-        <button id="btn-en" onclick="setLang('en')" class="active">EN</button>
-        <button id="btn-ar" onclick="setLang('ar')">عر</button>
-      </div>
-    </div>
-    <div class="header-right" id="header-right"></div>
-  </header>
-
-  <!-- HOME -->
-  <div id="page-home" class="page active">
-    <div class="home-hero">
-      <div class="hero-arch">
-        <h1>مجلس<span id="hero-sub"></span></h1>
-      </div>
-      <div class="hero-actions" id="hero-actions"></div>
-    </div>
-    <div class="search-bar">
-      <input type="text" id="search-input" oninput="filterRooms()">
-    </div>
-    <div class="section-title">
-      <span id="rooms-label"></span>
-      <button class="btn btn-gold btn-sm" id="create-room-btn" style="display:none" onclick="showModal('create-room')"></button>
-    </div>
-    <div class="rooms-grid" id="rooms-grid"><div class="empty-state"><div class="icon">🕌</div><p>Loading...</p></div></div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="page-chat" class="page">
-    <div class="chat-header">
-      <div>
-        <div class="chat-room-name" id="chat-room-name"></div>
-        <div class="chat-room-meta" id="chat-room-meta"></div>
-      </div>
-      <div class="chat-header-actions">
-        <button class="btn btn-outline btn-sm" id="leave-btn" onclick="leaveRoom()"></button>
-        <button class="btn btn-danger btn-sm" id="delete-room-btn" style="display:none" onclick="deleteRoom()"></button>
-      </div>
-    </div>
-    <div class="messages-area" id="messages-area"></div>
-    <div class="chat-input-area">
-      <div class="image-preview-wrap" id="img-preview-wrap">
-        <img id="img-preview-thumb" class="image-preview-thumb" src="" alt="">
-        <button class="remove-preview" onclick="clearImagePreview()">✕</button>
-      </div>
-      <div class="chat-input-row">
-        <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">🖼</button>
-        <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
-        <textarea id="msg-input" rows="1" onkeydown="handleMsgKey(event)" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="sendMessage()">➤</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="">
-  </div>
-
-  <!-- REGISTER MODAL -->
-  <div class="modal-overlay hidden" id="modal-register">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="reg-title"></h2><div class="ornament">✦ ◆ ✦</div>
-      <div class="form-group"><label id="lbl-reg-name"></label><input type="text" id="reg-username"></div>
-      <div class="form-group"><label id="lbl-reg-email"></label><input type="email" id="reg-email"></div>
-      <div class="form-group"><label id="lbl-reg-pass"></label><input type="password" id="reg-password"></div>
-      <div class="error-msg" id="reg-error"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" id="reg-cancel" onclick="hideModal('register')"></button>
-        <button class="btn btn-gold" id="reg-btn" onclick="register()"></button>
-      </div>
-      <div class="divider" id="reg-divider"></div>
-      <button class="btn btn-outline" style="width:100%" id="reg-switch" onclick="hideModal('register');showModal('login')"></button>
-    </div>
-  </div>
-
-  <!-- LOGIN MODAL -->
   <div class="modal-overlay hidden" id="modal-login">
     <div class="modal">
       <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
@@ -413,23 +287,86 @@ const auth=getAuth(fbApp);
 const db=getFirestore(fbApp);
 
 let currentUser=null,allRooms=[],currentRoomId=null,pendingRoomId=null,imageData=null,msgUnsub=null,roomsUnsub=null,uiLang='en';
+let soundEnabled=true, lastMsgCount=0;
 const transCache={};
+
+// ── Sound (soft oud-like tone via Web Audio API) ──
+let audioCtx=null;
+function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playNotification(){
+  if(!soundEnabled)return;
+  try{
+    const ctx=getAudioCtx();
+    const gain=ctx.createGain();
+    gain.connect(ctx.destination);
+    // two partials for a warm oud-like pluck
+    [220,440,660].forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const g=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(freq,ctx.currentTime);
+      g.gain.setValueAtTime(i===0?0.18:0.08,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);
+      osc.connect(g);g.connect(gain);
+      osc.start(ctx.currentTime);osc.stop(ctx.currentTime+1.2);
+    });
+  }catch(e){}
+}
+window.toggleSound=function(){
+  soundEnabled=!soundEnabled;
+  const btn=document.getElementById('sound-btn');
+  if(btn)btn.textContent=`🔔 Sound: ${soundEnabled?'ON':'OFF'}`;
+};
+
+// ── Curated marriage hadiths ──
+// Format: [collection, hadithNumber, arabicText, englishText, source]
+const MARRIAGE_HADITHS=[
+  ['bukhari',5063,'مَنِ اسْتَطَاعَ الْبَاءَةَ فَلْيَتَزَوَّجْ، فَإِنَّهُ أَغَضُّ لِلْبَصَرِ وَأَحْصَنُ لِلْفَرْجِ','Whoever among you can afford marriage, let him marry, for it is more effective in lowering the gaze and guarding chastity.','Sahih Bukhari 5063'],
+  ['bukhari',5090,'خَيْرُكُمْ خَيْرُكُمْ لِأَهْلِهِ، وَأَنَا خَيْرُكُمْ لِأَهْلِي','The best of you are those who are best to their wives, and I am the best of you to my wives.','Sahih Bukhari 5090'],
+  ['bukhari',5076,'تَزَوَّجُوا الْوَدُودَ الْوَلُودَ، فَإِنِّي مُكَاثِرٌ بِكُمُ الْأُمَمَ','Marry the loving and fertile women, for I will be proud of your great numbers before the nations.','Sahih Bukhari 5076'],
+  ['muslim',1467,'اسْتَوْصُوا بِالنِّسَاءِ خَيْرًا','Take care of women with kindness.','Sahih Muslim 1467'],
+  ['muslim',1469,'لَا يَفْرَكْ مُؤْمِنٌ مُؤْمِنَةً، إِنْ كَرِهَ مِنْهَا خُلُقًا رَضِيَ مِنْهَا آخَرَ','A believing man should not hate a believing woman. If he dislikes one of her qualities, he will be pleased with another.','Sahih Muslim 1469'],
+  ['muslim',1400,'يَا مَعْشَرَ الشَّبَابِ، مَنِ اسْتَطَاعَ مِنْكُمُ الْبَاءَةَ فَلْيَتَزَوَّجْ','O young men, whoever among you can afford marriage, let him marry.','Sahih Muslim 1400'],
+  ['abudawud',2142,'أَكْمَلُ الْمُؤْمِنِينَ إِيمَانًا أَحْسَنُهُمْ خُلُقًا، وَخِيَارُكُمْ خِيَارُكُمْ لِنِسَائِهِمْ','The most complete of the believers in faith are those with the best character, and the best of you are those who are best to their women.','Sunan Abu Dawud 2142'],
+  ['abudawud',2155,'مَا اسْتَفَادَ الْمُؤْمِنُ بَعْدَ تَقْوَى اللَّهِ خَيْرًا لَهُ مِنْ زَوْجَةٍ صَالِحَةٍ','A believer gains no benefit after fearing Allah greater than a righteous wife.','Sunan Abu Dawud 2155'],
+  ['abudawud',2047,'تَخَيَّرُوا لِنُطَفِكُمْ وَانْكِحُوا الْأَكْفَاءَ وَأَنْكِحُوا إِلَيْهِمْ','Choose well for your offspring, marry those who are compatible, and give your daughters in marriage to them.','Sunan Abu Dawud 2047'],
+  ['tirmidhi',1084,'إِذَا جَاءَكُمْ مَنْ تَرْضَوْنَ دِينَهُ وَخُلُقَهُ فَزَوِّجُوهُ','If someone whose religion and character you are pleased with comes to you seeking marriage, then marry him.','Jami at-Tirmidhi 1084'],
+  ['tirmidhi',1162,'أَيُّمَا امْرَأَةٍ مَاتَتْ وَزَوْجُهَا عَنْهَا رَاضٍ دَخَلَتِ الْجَنَّةَ','Any woman who dies while her husband is pleased with her will enter Paradise.','Jami at-Tirmidhi 1162'],
+  ['tirmidhi',1085,'انْكِحُوا الأَيَامَى','Arrange marriages for the unmarried among you.','Jami at-Tirmidhi 1085'],
+  ['bukhari',5365,'حَقُّ الْمَرْأَةِ عَلَى الزَّوْجِ أَنْ يُطْعِمَهَا إِذَا طَعِمَ، وَيَكْسُوَهَا إِذَا اكْتَسَى','The right of the wife over her husband is that he feeds her when he eats and clothes her when he dresses.','Sahih Bukhari 5365'],
+  ['muslim',1218,'وَلَهُنَّ عَلَيْكُمْ رِزْقُهُنَّ وَكِسْوَتُهُنَّ بِالْمَعْرُوفِ','And they (wives) have rights over you — their provision and clothing in a reasonable manner.','Sahih Muslim 1218'],
+  ['abudawud',2144,'لَا يَجْلِدُ أَحَدُكُمُ امْرَأَتَهُ جَلْدَ الْعَبْدِ ثُمَّ يُجَامِعُهَا فِي آخِرِ الْيَوْمِ','None of you should beat his wife as he beats a slave and then sleep with her at the end of the day.','Sunan Abu Dawud 2144'],
+];
+
+function loadHadith(){
+  const h=MARRIAGE_HADITHS[Math.floor(Math.random()*MARRIAGE_HADITHS.length)];
+  const [,,arabic,english,source]=h;
+  const isAr=uiLang==='ar';
+  document.getElementById('hadith-title').textContent=isAr?'✦ حديث اليوم ✦':'✦ Hadith of the Day ✦';
+  let html='';
+  if(isAr){
+    // Arabic mode: show Arabic first, then English below
+    html=`<div class="hadith-arabic">${arabic}</div><div class="hadith-english">${english}</div>`;
+  }else{
+    // English mode: show English first, then Arabic below
+    html=`<div class="hadith-english">${english}</div><div class="hadith-arabic">${arabic}</div>`;
+  }
+  document.getElementById('hadith-body').innerHTML=html;
+  document.getElementById('hadith-source').textContent=`— ${source}`;
+}
 
 // ── Language detection ──
 function detectLang(text){
-  if(/[\u0980-\u09FF]/.test(text)) return 'bn'; // Bangla
-  if(/[\u0600-\u06FF]/.test(text)) return 'ar'; // Arabic
-  return 'en'; // default to English
+  if(/[\u0980-\u09FF]/.test(text))return'bn';
+  if(/[\u0600-\u06FF]/.test(text))return'ar';
+  return'en';
 }
 
 // ── Strings ──
 const S={
   en:{
-    heroSub:'Enter the Gathering',
-    searchPh:'🔍  Search rooms...',
-    roomsLabel:'✦ Open Gatherings',
-    newRoom:'+ New Room',
-    signin:'Sign In',join:'Join',logout:'Leave',
+    heroSub:'Enter the Gathering',searchPh:'🔍  Search rooms...',roomsLabel:'✦ Open Gatherings',
+    newRoom:'+ New Room',signin:'Sign In',join:'Join',logout:'Leave',
     regTitle:'Join the Majlis',regName:'Username',regEmail:'Email',regPass:'Password',
     regCancel:'Cancel',regBtn:'Join',regDivider:'Already a member?',regSwitch:'Sign In Instead',
     loginTitle:'Welcome Back',loginEmail:'Email',loginPass:'Password',
@@ -438,25 +375,19 @@ const S={
     crCancel:'Cancel',crBtn:'Open',
     joinTitle:'Protected Room',joinDesc:'This gathering is password protected.',
     joinPass:'Password',joinCancel:'Cancel',joinEnter:'Enter',
-    leaveBtn:'← Leave',deleteBtn:'Delete Room',
-    msgPh:'Write your message...',
-    tapTranslate:'Tap to translate',
-    translating:'Translating...',
+    leaveBtn:'← Leave',deleteBtn:'Delete Room',msgPh:'Write your message...',
+    tapTranslate:'Tap to translate',translating:'Translating...',
     byLabel:'by',msgCount:'messages',yourRoom:'Your Room',
     emptyRooms:'No gatherings yet. Be the first!',noResults:'No rooms found.',
     openRoom:'🔓 Open',protectedRoom:'🔒 Protected',
     errFill:'Please fill all fields.',errPass6:'Password must be at least 6 characters.',
     errWrongPass:'Incorrect password.',errDel:'Delete this room? Cannot be undone.',
-    errImg:'Image must be under 3MB.',
-    sysEntered:'has entered the gathering',
+    errImg:'Image must be under 3MB.',sysEntered:'has entered the gathering',
     noAccount:'No account found.',wrongPass:'Incorrect email or password.',emailUsed:'Email already registered.',weakPass:'Password is too weak.',
   },
   ar:{
-    heroSub:'ادخل المجلس',
-    searchPh:'🔍  ابحث عن مجلس...',
-    roomsLabel:'✦ المجالس المفتوحة',
-    newRoom:'+ افتح مجلساً',
-    signin:'دخول',join:'تفضل',logout:'خروج',
+    heroSub:'ادخل المجلس',searchPh:'🔍  ابحث عن مجلس...',roomsLabel:'✦ المجالس المفتوحة',
+    newRoom:'+ افتح مجلساً',signin:'دخول',join:'تفضل',logout:'خروج',
     regTitle:'أهلاً وسهلاً',regName:'الاسم',regEmail:'البريد الإلكتروني',regPass:'كلمة المرور',
     regCancel:'إلغاء',regBtn:'انضم',regDivider:'عضو مسجل؟',regSwitch:'تسجيل الدخول',
     loginTitle:'مرحباً بعودتك',loginEmail:'البريد الإلكتروني',loginPass:'كلمة المرور',
@@ -465,17 +396,14 @@ const S={
     crCancel:'إلغاء',crBtn:'افتح',
     joinTitle:'مجلس محمي',joinDesc:'هذا المجلس محمي بكلمة مرور.',
     joinPass:'كلمة المرور',joinCancel:'إلغاء',joinEnter:'تفضل',
-    leaveBtn:'← مغادرة',deleteBtn:'حذف المجلس',
-    msgPh:'اكتب رسالتك هنا...',
-    tapTranslate:'اضغط للترجمة',
-    translating:'جاري الترجمة...',
+    leaveBtn:'← مغادرة',deleteBtn:'حذف المجلس',msgPh:'اكتب رسالتك هنا...',
+    tapTranslate:'اضغط للترجمة',translating:'جاري الترجمة...',
     byLabel:'بقلم',msgCount:'أحاديث',yourRoom:'مجلسك',
     emptyRooms:'لا توجد مجالس بعد. كن أول من يفتح مجلساً!',noResults:'لا توجد مجالس مطابقة.',
     openRoom:'🔓 مفتوح',protectedRoom:'🔒 محمي',
     errFill:'يرجى تعبئة جميع الحقول.',errPass6:'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
     errWrongPass:'كلمة المرور غير صحيحة.',errDel:'حذف هذا المجلس؟ لا يمكن التراجع.',
-    errImg:'الصورة يجب أن تكون أقل من 3 ميجابايت.',
-    sysEntered:'دخل المجلس',
+    errImg:'الصورة يجب أن تكون أقل من 3 ميجابايت.',sysEntered:'دخل المجلس',
     noAccount:'لا يوجد حساب بهذا البريد.',wrongPass:'بريد أو كلمة مرور خاطئة.',emailUsed:'البريد مسجل مسبقاً.',weakPass:'كلمة المرور ضعيفة جداً.',
   }
 };
@@ -487,8 +415,7 @@ function applyLang(){
   set('hero-sub',t('heroSub'));
   document.getElementById('search-input').placeholder=t('searchPh');
   set('rooms-label',t('roomsLabel'));
-  set('create-room-btn',t('newRoom'));
-  set('msg-input','');document.getElementById('msg-input').placeholder=t('msgPh');
+  document.getElementById('msg-input').placeholder=t('msgPh');
   set('reg-title',t('regTitle'));set('lbl-reg-name',t('regName'));set('lbl-reg-email',t('regEmail'));
   set('lbl-reg-pass',t('regPass'));set('reg-cancel',t('regCancel'));set('reg-btn',t('regBtn'));
   set('reg-divider',t('regDivider'));set('reg-switch',t('regSwitch'));
@@ -505,7 +432,8 @@ function applyLang(){
   document.querySelectorAll('.translate-hint').forEach(el=>el.textContent=t('tapTranslate'));
 }
 
-window.setLang=lang=>{uiLang=lang;applyLang();};
+window.setLang=lang=>{uiLang=lang;applyLang();
+loadHadith();};
 
 function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
 function v(id){const el=document.getElementById(id);return el?el.value:'';}
@@ -533,8 +461,7 @@ window.register=async()=>{
   try{
     const cred=await createUserWithEmailAndPassword(auth,email,pass);
     await updateProfile(cred.user,{displayName:name});
-    currentUser=cred.user;
-    hideModal('register');
+    currentUser=cred.user;hideModal('register');
     clearFields(['reg-username','reg-email','reg-password']);
   }catch(e){showError('reg-error',friendlyError(e.code));}
   setLoading('reg-btn',false);
@@ -546,8 +473,7 @@ window.login=async()=>{
   setLoading('login-btn',true);
   try{
     await signInWithEmailAndPassword(auth,email,pass);
-    hideModal('login');
-    clearFields(['login-email','login-password']);
+    hideModal('login');clearFields(['login-email','login-password']);
   }catch(e){showError('login-error',friendlyError(e.code));}
   setLoading('login-btn',false);
 };
@@ -557,16 +483,13 @@ window.logout=async()=>{leaveRoom();await signOut(auth);};
 function updateHeaderUI(){
   const el=document.getElementById('header-right');
   const ha=document.getElementById('hero-actions');
-  const cb=document.getElementById('create-room-btn');
   if(currentUser){
     const ini=(currentUser.displayName||currentUser.email).substring(0,2).toUpperCase();
     el.innerHTML=`<div class="user-badge"><div class="avatar">${ini}</div><span>${escHtml(currentUser.displayName||currentUser.email)}</span></div><button class="btn btn-outline btn-sm" onclick="logout()">${t('logout')}</button>`;
     ha.innerHTML=`<button class="btn btn-gold" onclick="showModal('create-room')">✦ ${t('newRoom')}</button>`;
-    if(cb)cb.style.display='inline-flex';
   }else{
     el.innerHTML=`<button class="btn btn-outline btn-sm" onclick="showModal('login')">${t('signin')}</button><button class="btn btn-gold btn-sm" onclick="showModal('register')">${t('join')}</button>`;
     ha.innerHTML=`<button class="btn btn-gold" onclick="showModal('register')">✦ ${t('join')}</button><button class="btn btn-outline" onclick="showModal('login')">${t('signin')}</button>`;
-    if(cb)cb.style.display='none';
   }
 }
 
@@ -585,7 +508,7 @@ function renderRooms(){
   if(!arr.length){grid.innerHTML=`<div class="empty-state"><div class="icon">🕌</div><p>${q?t('noResults'):t('emptyRooms')}</p></div>`;return;}
   grid.innerHTML=arr.map(r=>{
     const isOwner=currentUser&&currentUser.uid===r.ownerId;
-    return `<div class="room-card" onclick="tryEnterRoom('${r.id}')">
+    return`<div class="room-card" onclick="tryEnterRoom('${r.id}')">
       <div class="room-card-header"><div class="room-name">${escHtml(r.name)}</div><span>${r.password?'🔒':'🔓'}</span></div>
       <div class="room-desc">${escHtml(r.desc||'...')}</div>
       <div class="room-meta">
@@ -627,13 +550,12 @@ window.joinRoomWithPassword=()=>{
 };
 
 function enterRoom(id){
-  currentRoomId=id;
+  currentRoomId=id;lastMsgCount=0;
   const room=allRooms.find(r=>r.id===id);
   document.getElementById('chat-room-name').textContent=room.name;
   document.getElementById('chat-room-meta').textContent=(room.desc||'')+(room.password?'  '+t('protectedRoom'):'  '+t('openRoom'));
   document.getElementById('delete-room-btn').style.display=currentUser.uid===room.ownerId?'inline-flex':'none';
-  set('delete-room-btn',t('deleteBtn'));
-  set('leave-btn',t('leaveBtn'));
+  set('delete-room-btn',t('deleteBtn'));set('leave-btn',t('leaveBtn'));
   navigate('chat');
   listenMessages(id);
   const sysMsg=uiLang==='ar'?`أهلاً وسهلاً بـ ${currentUser.displayName||currentUser.email} في المجلس`:`${currentUser.displayName||currentUser.email} ${t('sysEntered')}`;
@@ -642,7 +564,7 @@ function enterRoom(id){
 
 window.leaveRoom=()=>{
   if(msgUnsub){msgUnsub();msgUnsub=null;}
-  currentRoomId=null;
+  currentRoomId=null;lastMsgCount=0;
   document.getElementById('messages-area').innerHTML='';
   navigate('home');
 };
@@ -659,9 +581,17 @@ window.deleteRoom=async()=>{
 
 function listenMessages(roomId){
   if(msgUnsub)msgUnsub();
+  let isFirst=true;
   msgUnsub=onSnapshot(query(collection(db,'rooms',roomId,'messages'),orderBy('ts','asc')),snap=>{
     const area=document.getElementById('messages-area');
     const atBottom=area.scrollHeight-area.clientHeight<=area.scrollTop+60;
+    // play sound for new messages after initial load
+    if(!isFirst&&snap.docs.length>lastMsgCount){
+      const newest=snap.docs[snap.docs.length-1].data();
+      if(newest.authorId!==currentUser.uid)playNotification();
+    }
+    lastMsgCount=snap.docs.length;
+    isFirst=false;
     area.innerHTML=snap.docs.map(d=>{
       const m=d.data();
       if(m.type==='system')return`<div class="msg system"><div class="msg-bubble"><div class="msg-text">${escHtml(m.text)}</div></div></div>`;
@@ -677,9 +607,7 @@ function listenMessages(roomId){
         <div class="msg-bubble" onclick="translateMsg('${d.id}','${escAttr(m.text||'')}')">
           ${isOwn?'':`<div class="msg-author">${escHtml(m.author)}</div>`}
           ${m.text?`<div class="msg-text">${escHtml(m.text)}</div>`:''}
-          ${imgHtml}
-          ${transHtml}
-          ${hint}
+          ${imgHtml}${transHtml}${hint}
           <div class="msg-time">${time}</div>
         </div>
       </div>`;
@@ -690,36 +618,23 @@ function listenMessages(roomId){
 }
 
 // ── Translation ──
-// Detects language and always translates TO Arabic.
-// Arabic messages translate to English (for readability when UI is in EN).
 window.translateMsg=async(msgId,text)=>{
   if(!text||!text.trim())return;
   const el=document.getElementById('trans-'+msgId);
   if(!el)return;
-  // toggle off
   if(el.classList.contains('show')){el.classList.remove('show');return;}
-  // use cache
   if(transCache[msgId]){el.textContent=transCache[msgId];el.classList.add('show');return;}
-
   const lang=detectLang(text);
-  // Arabic → English, everything else (English, Bangla) → Arabic
   const pair=lang==='ar'?'ar|en':`${lang}|ar`;
-
   el.innerHTML=`<span class="spin"></span>${t('translating')}`;
   el.classList.add('show');
   try{
     const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${pair}`);
     const data=await res.json();
     const result=data.responseData?.translatedText;
-    if(result&&result!==text){
-      transCache[msgId]=result;
-      el.textContent=result;
-    }else{
-      el.textContent=lang==='ar'?'Translation unavailable':'الترجمة غير متاحة';
-    }
-  }catch(e){
-    el.textContent=lang==='ar'?'Translation failed':'فشل الترجمة';
-  }
+    if(result&&result!==text){transCache[msgId]=result;el.textContent=result;}
+    else{el.textContent=lang==='ar'?'Translation unavailable':'الترجمة غير متاحة';}
+  }catch(e){el.textContent=lang==='ar'?'Translation failed':'فشل الترجمة';}
 };
 
 window.sendMessage=async()=>{
@@ -744,7 +659,11 @@ window.clearImagePreview=()=>{imageData=null;document.getElementById('img-previe
 window.openLightbox=src=>{document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.remove('hidden');};
 window.closeLightbox=()=>document.getElementById('lightbox').classList.add('hidden');
 
-window.navigate=page=>{document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');};
+window.navigate=page=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('chat-input-area').style.display=page==='chat'?'block':'none';
+};
 window.showModal=id=>document.getElementById('modal-'+id).classList.remove('hidden');
 window.hideModal=id=>{document.getElementById('modal-'+id).classList.add('hidden');clearErrors();};
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hidden');}));
