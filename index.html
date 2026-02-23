@@ -333,40 +333,46 @@ function playNotification(){
   }catch(e){}
 }
 
-// ── Hadith (api.hadith.gading.dev) ──
-const COLLECTIONS=['bukhari','muslim','abu-dawud','ibn-majah','tirmidzi'];
-const COLLECTION_SIZES={bukhari:7563,muslim:3032,'abu-dawud':5274,'ibn-majah':4341,tirmidzi:3956};
-const COLLECTION_LABELS={bukhari:'Sahih Bukhari',muslim:'Sahih Muslim','abu-dawud':'Sunan Abu Dawud','ibn-majah':'Sunan Ibn Majah',tirmidzi:"Jami' at-Tirmidhi"};
+// ── Hadith (jsdelivr — full collections with real English translations) ──
+// Collections hosted at cdn.jsdelivr.net/gh/fawazahmed0/hadith-api
+const COLLECTIONS=[
+  {key:'bukhari',  label:'Sahih Bukhari',      size:7563},
+  {key:'muslim',   label:'Sahih Muslim',        size:3032},
+  {key:'abudawud', label:'Sunan Abu Dawud',     size:5274},
+  {key:'ibnmajah', label:'Sunan Ibn Majah',     size:4341},
+  {key:'tirmidhi', label:"Jami' at-Tirmidhi",  size:3956},
+];
 
 async function loadHadith(){
-  const col=COLLECTIONS[Math.floor(Math.random()*COLLECTIONS.length)];
-  const num=Math.floor(Math.random()*COLLECTION_SIZES[col])+1;
   const isAr=uiLang==='ar';
   document.getElementById('hadith-label').textContent=isAr?'✦ حديث اليوم ✦':'✦ Hadith of the Day ✦';
   document.getElementById('hadith-body').innerHTML=`<div class="hadith-loading"><span class="spin"></span></div>`;
   document.getElementById('hadith-source').textContent='';
+
+  const col=COLLECTIONS[Math.floor(Math.random()*COLLECTIONS.length)];
+  const num=Math.floor(Math.random()*col.size)+1;
+
   try{
-    const res=await fetch(`https://api.hadith.gading.dev/books/${col}/${num}`);
-    const data=await res.json();
-    const h=data?.data?.contents;
-    if(!h)throw new Error('no data');
-    const arabic=h.arab||'';
-    const english=h.id||''; // this API returns Indonesian; fall back gracefully
-    // fetch English from another endpoint if needed — for now show Arabic + available text
-    let bodyHtml='';
-    if(isAr){
-      bodyHtml=`${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}${english?`<div class="hadith-english">${english}</div>`:''}`;
-    }else{
-      bodyHtml=`${english?`<div class="hadith-english">${english}</div>`:''}${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}`;
-    }
-    document.getElementById('hadith-body').innerHTML=bodyHtml||`<div class="hadith-english">Hadith not available.</div>`;
-    document.getElementById('hadith-source').textContent=`— ${COLLECTION_LABELS[col]}, No. ${num}`;
+    // fetch English and Arabic in parallel
+    const [enRes,arRes]=await Promise.all([
+      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col.key}/${num}.json`),
+      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col.key}/${num}.json`),
+    ]);
+    const [enData,arData]=await Promise.all([enRes.json(),arRes.json()]);
+    const english=enData?.hadiths?.[0]?.text||enData?.hadith?.[0]?.body||'';
+    const arabic=arData?.hadiths?.[0]?.text||arData?.hadith?.[0]?.body||'';
+    if(!english&&!arabic)throw new Error('empty');
+    document.getElementById('hadith-body').innerHTML=isAr
+      ?`${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}${english?`<div class="hadith-english">${english}</div>`:''}`
+      :`${english?`<div class="hadith-english">${english}</div>`:''}${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}`;
+    document.getElementById('hadith-source').textContent=`— ${col.label}, No. ${num}`;
   }catch(e){
-    // API failed — show a reliable fallback hadith
+    // fallback hadiths if CDN is unreachable
     const fallbacks=[
-      {ar:'خَيْرُكُمْ خَيْرُكُمْ لِأَهْلِهِ وَأَنَا خَيْرُكُمْ لِأَهْلِي',en:'The best of you are those who are best to their families, and I am the best of you to my family.',src:'Sahih Bukhari, No. 5090'},
       {ar:'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ',en:'Actions are judged by their intentions.',src:'Sahih Bukhari, No. 1'},
+      {ar:'خَيْرُكُمْ خَيْرُكُمْ لِأَهْلِهِ وَأَنَا خَيْرُكُمْ لِأَهْلِي',en:'The best of you are those who are best to their families, and I am the best of you to my family.',src:'Sahih Bukhari, No. 5090'},
       {ar:'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',en:'A Muslim is one from whose tongue and hand other Muslims are safe.',src:'Sahih Bukhari, No. 10'},
+      {ar:'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',en:'None of you truly believes until he loves for his brother what he loves for himself.',src:'Sahih Bukhari, No. 13'},
     ];
     const f=fallbacks[Math.floor(Math.random()*fallbacks.length)];
     document.getElementById('hadith-body').innerHTML=isAr
