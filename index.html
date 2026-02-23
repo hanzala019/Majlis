@@ -102,6 +102,151 @@ input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(20
 .msg-translation.show{display:block;}
 .translate-hint{font-size:0.65rem;color:var(--gold3);margin-top:4px;opacity:0.7;}
 .msg-img{max-width:260px;max-height:260px;border-radius:8px 8px 4px 4px;display:block;margin-top:8px;cursor:pointer;border:1px solid var(--border);}
+.chat-input-area{background:rgba(8,5,1,0.98);border-top:1px solid var(--border);padding:16px 20px;flex-shrink:0;display:none;}
+.chat-input-row{display:flex;gap:10px;align-items:flex-end;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;}
+.chat-input-row:focus-within{border-color:var(--gold);}
+#msg-input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Lora',serif;font-size:0.9rem;resize:none;outline:none;max-height:120px;min-height:36px;line-height:1.5;padding-top:4px;}
+#msg-input::placeholder{color:var(--text2);font-style:italic;}
+.img-upload-btn{background:none;border:none;cursor:pointer;color:var(--gold3);font-size:1.3rem;padding:4px 6px;transition:color 0.2s;}
+.img-upload-btn:hover{color:var(--gold);}
+.send-btn{background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:50%;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--dark);font-size:1.1rem;transition:all 0.2s;flex-shrink:0;}
+.send-btn:hover{transform:scale(1.1);box-shadow:0 0 14px rgba(201,168,76,0.4);}
+.image-preview-wrap{display:none;padding:8px 0;position:relative;width:fit-content;}
+.image-preview-wrap.show{display:block;}
+.image-preview-thumb{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--border2);}
+.remove-preview{position:absolute;top:-6px;right:-6px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:0.65rem;display:flex;align-items:center;justify-content:center;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.93);display:flex;align-items:center;justify-content:center;z-index:300;cursor:zoom-out;backdrop-filter:blur(10px);}
+.lightbox.hidden{display:none;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;border:1px solid var(--border2);}
+.page{display:none;}.page.active{display:block;}#page-chat.active{display:flex;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(201,168,76,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:4px;}
+/* Hadith card */
+.hadith-card{background:linear-gradient(160deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:32px;position:relative;overflow:hidden;}
+.hadith-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.hadith-title{font-family:'Amiri',serif;color:var(--gold);font-size:1rem;letter-spacing:3px;text-align:center;margin-bottom:16px;}
+.hadith-arabic{font-family:'Amiri',serif;font-size:1.15rem;line-height:2;color:var(--text);text-align:right;direction:rtl;margin-bottom:12px;}
+.hadith-english{font-size:0.88rem;line-height:1.8;color:var(--text2);font-style:italic;margin-bottom:12px;}
+.hadith-source{font-size:0.75rem;color:var(--gold3);text-align:center;letter-spacing:1px;}
+.hadith-loading{text-align:center;color:var(--text2);font-style:italic;padding:20px 0;}
+/* sound toggle */
+.sound-btn{background:none;border:1px solid var(--border);border-radius:20px;color:var(--text2);padding:4px 10px;font-size:0.75rem;cursor:pointer;transition:all 0.2s;font-family:'Lora',serif;}
+.sound-btn:hover{border-color:var(--gold);color:var(--gold);}
+@media(max-width:600px){header{padding:0 10px;}.header-center{display:none;}#page-home{padding:16px 12px;}.msg{max-width:90%;}.messages-area{padding:12px;}.chat-input-area{padding:10px;}.hero-arch{padding:20px 24px;}}
+</style>
+</head>
+<body>
+<script>
+for(let i=0;i<10;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*4+2;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*15}s;`;document.body.appendChild(p);}
+</script>
+<div id="app">
+  <header>
+    <div class="logo" onclick="navigate('home')">مجلس<span class="logo-sub">Unmarried Gathering</span></div>
+    <div class="header-center">
+      <div class="hijri-date" id="hijri-date"></div>
+      <div class="lang-toggle">
+        <button id="btn-en" onclick="setLang('en')" class="active">EN</button>
+        <button id="btn-ar" onclick="setLang('ar')">عر</button>
+      </div>
+    </div>
+    <div class="header-right" id="header-right"></div>
+  </header>
+
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="home-hero">
+      <div class="hero-arch">
+        <h1>مجلس<span id="hero-sub"></span></h1>
+      </div>
+      <div class="hero-actions" id="hero-actions"></div>
+    </div>
+
+    <!-- Hadith Card -->
+    <div class="hadith-card" id="hadith-card">
+      <div class="hadith-title" id="hadith-title">✦ Hadith of the Day ✦</div>
+      <div class="hadith-loading" id="hadith-body"><span class="spin"></span></div>
+      <div class="hadith-source" id="hadith-source"></div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" oninput="filterRooms()">
+    </div>
+    <div class="section-title">
+      <span id="rooms-label"></span>
+    </div>
+    <div class="rooms-grid" id="rooms-grid"><div class="empty-state"><div class="icon">🕌</div><p>Loading...</p></div></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="page-chat" class="page">
+    <div class="chat-header">
+      <div>
+        <div class="chat-room-name" id="chat-room-name"></div>
+        <div class="chat-room-meta" id="chat-room-meta"></div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔔 Sound: ON</button>
+        <button class="btn btn-outline btn-sm" id="leave-btn" onclick="leaveRoom()"></button>
+        <button class="btn btn-danger btn-sm" id="delete-room-btn" style="display:none" onclick="deleteRoom()"></button>
+      </div>
+    </div>
+    <div class="messages-area" id="messages-area"></div>
+    <div class="chat-input-area" id="chat-input-area">
+      <div class="image-preview-wrap" id="img-preview-wrap">
+        <img id="img-preview-thumb" class="image-preview-thumb" src="" alt="">
+        <button class="remove-preview" onclick="clearImagePreview()">✕</button>
+      </div>
+      <div class="chat-input-row">
+        <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">🖼</button>
+        <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+        <textarea id="msg-input" rows="1" onkeydown="handleMsgKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <!-- REGISTER MODAL -->
+  <div class="modal-overlay hidden" id="modal-register">
+    <div class="modal">
+      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
+      <h2 id="reg-title"></h2><div class="ornament">✦ ◆ ✦</div>
+      <div class="form-group"><label id="lbl-reg-name"></label><input type="text" id="reg-username"></div>
+      <div class="form-group"><label id="lbl-reg-email"></label><input type="email" id="reg-email"></div>
+      <div class="form-group"><label id="lbl-reg-pass"></label><input type="password" id="reg-password"></div>
+      <div class="error-msg" id="reg-error"></div>
+      <div class="form-actions">
+        <button class="btn btn-outline" id="reg-cancel" onclick="hideModal('register')"></button>
+        <button class="btn btn-gold" id="reg-btn" onclick="register()"></button>
+      </div>
+      <div class="divider" id="reg-divider"></div>
+      <button class="btn btn-outline" style="width:100%" id="reg-switch" onclick="hideModal('register');showModal('login')"></button>
+    </div>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay hidden" id="modr(--border);border-radius:3px;}
+.msg{display:flex;gap:10px;align-items:flex-end;max-width:72%;}
+.msg.own{align-self:flex-end;flex-direction:row-reverse;}
+.msg.system{align-self:center;max-width:100%;}
+.msg-avatar .avatar{width:34px;height:34px;font-size:0.75rem;}
+.msg-bubble{background:linear-gradient(160deg,var(--dark3),var(--dark4));border:1px solid var(--border);border-radius:48% 48% 8px 8px/18% 18% 8px 8px;padding:16px 14px 10px;max-width:100%;position:relative;cursor:pointer;transition:border-color 0.2s;}
+.msg-bubble:hover{border-color:var(--border2);}
+.msg.own .msg-bubble{background:linear-gradient(160deg,rgba(139,105,20,0.22),rgba(80,58,8,0.28));border-color:rgba(201,168,76,0.35);}
+.msg.system .msg-bubble{background:rgba(201,168,76,0.05);border-color:var(--border);border-radius:20px;padding:6px 20px;text-align:center;cursor:default;}
+.msg-bubble::after{content:'✦';position:absolute;top:4px;right:8px;font-size:0.45rem;color:var(--gold3);opacity:0.5;}
+.msg.system .msg-bubble::after{display:none;}
+.msg-author{font-family:'Amiri',serif;font-size:0.82rem;color:var(--gold);margin-bottom:4px;font-weight:700;}
+.msg-text{font-size:0.9rem;line-height:1.6;word-break:break-word;}
+.msg.system .msg-text{font-size:0.78rem;color:var(--text2);font-style:italic;font-family:'Amiri',serif;}
+.msg-time{font-size:0.65rem;color:var(--text2);margin-top:6px;text-align:right;}
+.msg-translation{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.82rem;color:var(--text2);line-height:1.6;font-style:italic;display:none;}
+.msg-translation.show{display:block;}
+.translate-hint{font-size:0.65rem;color:var(--gold3);margin-top:4px;opacity:0.7;}
+.msg-img{max-width:260px;max-height:260px;border-radius:8px 8px 4px 4px;display:block;margin-top:8px;cursor:pointer;border:1px solid var(--border);}
 .chat-input-area{background:rgba(8,5,1,0.98);border-top:1px solid var(--border);padding:16px 20px;flex-shrink:0;}
 .chat-input-row{display:flex;gap:10px;align-items:flex-end;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;}
 .chat-input-row:focus-within{border-color:var(--gold);}
