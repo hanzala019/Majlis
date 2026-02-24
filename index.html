@@ -193,7 +193,7 @@ for(let i=0;i<10;i++){const p=document.createElement('div');p.className='particl
 </script>
 <div id="app">
   <header>
-    <div class="logo" onclick="navigate('home')">مجلس<span class="logo-sub">Unmarried Gathering</span></div>
+    <div class="logo" onclick="navigate('home')">مجلس<span class="logo-sub">The Arabian Gathering</span></div>
     <div class="header-center">
       <div class="hijri-date" id="hijri-date"></div>
       <div class="lang-toggle">
@@ -561,7 +561,9 @@ async function loadHadith(){
   const col=COLLECTIONS[Math.floor(Math.random()*COLLECTIONS.length)];
   const num=Math.floor(Math.random()*col.size)+1;
   try{
-    const[enRes,arRes]=await Promise.all([fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col.key}/${num}.json`),fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col.key}/${num}.json`)]);
+    const ctrl=new AbortController();
+    setTimeout(()=>ctrl.abort(),8000);
+    const[enRes,arRes]=await Promise.all([fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col.key}/${num}.json`,{signal:ctrl.signal}),fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col.key}/${num}.json`,{signal:ctrl.signal})]);
     const[enData,arData]=await Promise.all([enRes.json(),arRes.json()]);
     const english=enData?.hadiths?.[0]?.text||enData?.hadith?.[0]?.body||'';
     const arabic=arData?.hadiths?.[0]?.text||arData?.hadith?.[0]?.body||'';
@@ -657,7 +659,22 @@ function updateHeaderUI(){
 
 function listenRooms(){
   if(roomsUnsub)roomsUnsub();
-  roomsUnsub=onSnapshot(query(collection(db,'rooms'),where('visibility','==','public'),orderBy('createdAt','desc')),snap=>{allRooms=snap.docs.map(d=>({id:d.id,...d.data()}));renderRooms();});
+  // Try with ordering first, fall back to simple collection if index not ready
+  const q=query(collection(db,'rooms'),orderBy('createdAt','desc'));
+  roomsUnsub=onSnapshot(q,snap=>{
+    // Filter public rooms client-side so no composite index is needed
+    allRooms=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>!r.visibility||r.visibility==='public');
+    renderRooms();
+  },err=>{
+    // If orderBy fails too, just get all rooms unordered
+    const q2=query(collection(db,'rooms'));
+    roomsUnsub=onSnapshot(q2,snap=>{
+      allRooms=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>!r.visibility||r.visibility==='public');
+      renderRooms();
+    },()=>{
+      document.getElementById('rooms-grid').innerHTML=`<div class="empty-state"><div class="icon">🕌</div><p>${t('emptyRooms')}</p></div>`;
+    });
+  });
 }
 
 function renderRooms(){
@@ -695,10 +712,12 @@ async function joinByCode(){
   const code=v('private-code-input').trim().toUpperCase();if(!code)return;
   setLoading('join-code-btn',true);
   try{
-    const snap=await getDocs(query(collection(db,'rooms'),where('code','==',code),where('visibility','==','private')));
-    if(snap.empty){alert(t('errCode'));setLoading('join-code-btn',false);return;}
+    // Search all rooms client-side to avoid needing composite index
+    const snap=await getDocs(collection(db,'rooms'));
+    const match=snap.docs.find(d=>{const data=d.data();return data.code===code&&data.visibility==='private';});
+    if(!match){alert(t('errCode'));setLoading('join-code-btn',false);return;}
     document.getElementById('private-code-input').value='';
-    enterRoom(snap.docs[0].id);
+    enterRoom(match.id);
   }catch(e){alert(t('errCode'));}
   setLoading('join-code-btn',false);
 }
