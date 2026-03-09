@@ -1,531 +1,590 @@
-import { useState, useEffect } from "react";
-import {
-  Phone, Mail, MapPin, Menu, X, ChevronRight, Star,
-  ShieldCheck, UserCheck, BookOpen, Clock, Heart,
-  CheckCircle, MessageCircle, ArrowRight, Wifi, Camera
-} from "lucide-react";
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>রাহবার মাদকশক্তি নিরাময় কেন্দ্র</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#065f46;--green2:#047857;--green3:#d1fae5;--green4:#ecfdf5;
+  --slate:#1e293b;--gray:#64748b;--light:#f8fafc;
+  --radius:1rem;--shadow:0 4px 24px rgba(6,95,70,.10);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:var(--slate);overflow-x:hidden;background:#fff}
 
-const EMERALD = "#065f46";
-const PHONE = "+8801700000000";
-const EMAIL = "info@rahbarkendro.org";
-const ADDRESS = "Uttara, Dhaka, Bangladesh";
+/* ── GEO PATTERN ── */
+.geo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.045}
 
-// SVG Islamic Geometric Pattern
-const GeoBg = ({ opacity = 0.06 }) => (
-  <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="geo" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-        <polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" strokeWidth="0.8" opacity={opacity * 10} />
-        <polygon points="30,12 48,21 48,39 30,48 12,39 12,21" fill="none" stroke="#065f46" strokeWidth="0.4" opacity={opacity * 8} />
-        <circle cx="30" cy="30" r="3" fill="#065f46" opacity={opacity * 6} />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#geo)" />
-  </svg>
-);
+/* ── UTIL ── */
+.container{max-width:1100px;margin:0 auto;padding:0 1.25rem}
+.section{padding:5rem 0;position:relative;overflow:hidden}
+.section-label{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:.5rem}
+.section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--slate);line-height:1.2}
+.section-sub{color:var(--gray);margin-top:.75rem;max-width:540px;line-height:1.7}
+.section-head{text-align:center;margin-bottom:3.5rem}
+.section-head .section-sub{margin:0.75rem auto 0}
+.tag{display:inline-block;background:var(--green3);color:var(--green);font-size:.68rem;font-weight:600;padding:.25rem .6rem;border-radius:.5rem}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:'Inter',sans-serif;font-weight:700;border:none;cursor:pointer;border-radius:var(--radius);transition:all .2s;text-decoration:none}
+.btn-primary{background:var(--green);color:#fff;padding:.85rem 1.8rem;font-size:.95rem;box-shadow:0 4px 16px rgba(6,95,70,.35)}
+.btn-primary:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(6,95,70,.4)}
+.btn-outline{background:transparent;color:var(--green);border:2px solid var(--green);padding:.8rem 1.8rem;font-size:.95rem}
+.btn-outline:hover{background:var(--green4);transform:translateY(-2px)}
+.card{background:#fff;border-radius:1.25rem;border:1.5px solid #e2e8f0;padding:1.75rem;box-shadow:0 2px 12px rgba(0,0,0,.05);transition:all .3s}
+.card:hover{box-shadow:var(--shadow);transform:translateY(-4px)}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1.75rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.check-icon{width:18px;height:18px;border-radius:50%;background:var(--green3);color:var(--green);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 
-// Star rating helper
-const Stars = ({ n = 5 }) => Array.from({ length: n }).map((_, i) => (
-  <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
-));
+/* ── NAV ── */
+#navbar{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:all .3s}
+#navbar.scrolled{box-shadow:0 4px 20px rgba(0,0,0,.1);border-color:#e2e8f0}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:.75rem;cursor:pointer;text-decoration:none}
+.logo-icon{width:42px;height:42px;background:var(--green);border-radius:.75rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(6,95,70,.3);flex-shrink:0}
+.logo-text p:first-child{font-weight:900;font-size:.95rem;color:var(--green)}
+.logo-text p:last-child{font-size:.7rem;color:var(--gray)}
+.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links a{font-size:.88rem;font-weight:600;color:var(--gray);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--green)}
+.nav-emergency{display:flex;align-items:center;gap:.4rem;background:var(--green);color:#fff;padding:.55rem 1.2rem;border-radius:.75rem;font-size:.85rem;font-weight:700;text-decoration:none;transition:all .2s}
+.nav-emergency:hover{background:var(--green2);box-shadow:0 4px 16px rgba(6,95,70,.4)}
+.nav-emergency svg{animation:pulse2 1.5s infinite}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.5}}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;border:none;background:none}
+.hamburger span{width:24px;height:2.5px;background:var(--slate);border-radius:2px;transition:all .3s;display:block}
+.hamburger.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+.mobile-menu{display:none;flex-direction:column;background:#fff;padding:1rem 1.25rem 1.5rem;border-top:1px solid #e2e8f0;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.mobile-menu.open{display:flex}
+.mobile-menu a{padding:.75rem 0;font-size:.95rem;font-weight:600;color:var(--gray);text-decoration:none;border-bottom:1px solid #f1f5f9}
+.mobile-menu a:hover{color:var(--green)}
+.mobile-emergency{margin-top:.75rem;text-align:center;background:var(--green);color:#fff;padding:.85rem;border-radius:.75rem;font-weight:700;font-size:.95rem;text-decoration:none;display:block}
 
-// Nav links
-const NAV = ["সেবা", "মূল্য তালিকা", "সাফল্যের গল্প", "যোগাযোগ"];
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:64px;
+  background:linear-gradient(135deg,#ecfdf5 0%,#f0f9ff 50%,#f8fafc 100%)}
+.hero-blob1{position:absolute;top:10%;left:5%;width:340px;height:340px;border-radius:50%;
+  background:var(--green);opacity:.12;filter:blur(80px);pointer-events:none}
+.hero-blob2{position:absolute;bottom:10%;right:5%;width:420px;height:420px;border-radius:50%;
+  background:#3b82f6;opacity:.07;filter:blur(100px);pointer-events:none}
+.hero-inner{position:relative;z-index:1;text-align:center;padding:3rem 0}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1.5px solid #a7f3d0;color:var(--green);font-size:.75rem;font-weight:700;padding:.45rem 1rem;border-radius:999px;box-shadow:0 2px 8px rgba(6,95,70,.1);margin-bottom:1.5rem}
+.hero-badge-dot{width:8px;height:8px;border-radius:50%;background:#10b981;animation:pulse2 1.2s infinite}
+.hero-h1{font-size:clamp(2rem,6vw,3.6rem);font-weight:900;line-height:1.15;margin-bottom:.75rem;color:var(--green)}
+.hero-h1 span{color:var(--slate)}
+.motto-wrap{position:relative;display:inline-block;margin:1.25rem 0}
+.motto-pill{background:var(--green);color:#fff;font-size:clamp(1rem,2.5vw,1.3rem);font-weight:700;padding:.75rem 2rem;border-radius:1.25rem;display:inline-block;box-shadow:0 8px 24px rgba(6,95,70,.3)}
+.hero-desc{color:var(--gray);font-size:clamp(.9rem,2vw,1.05rem);max-width:580px;margin:1.25rem auto 2rem;line-height:1.8}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:1.25rem;margin-top:2.5rem;font-size:.82rem;color:var(--gray)}
 
-export default function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [formData, setFormData] = useState({ name: "", phone: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+/* ── SERVICES ── */
+#services{background:#fff}
+.svc-icon{width:48px;height:48px;border-radius:.85rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;flex-shrink:0}
+.svc-title{font-size:1.05rem;font-weight:800;color:var(--slate);margin-bottom:.5rem}
+.svc-desc{font-size:.85rem;color:var(--gray);line-height:1.7;margin-bottom:1rem}
+.svc-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.card-accent{position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 1.25rem 0 100%;opacity:.1;transition:opacity .3s}
+.card:hover .card-accent{opacity:.2}
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+/* ── PRICING ── */
+#pricing{background:linear-gradient(135deg,#f0fdf4 0%,#eff6ff 100%)}
+.price-card{border-radius:1.5rem;padding:2.5rem;position:relative;overflow:hidden}
+.price-card.standard{background:#fff;border:2px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.price-card.standard:hover{box-shadow:0 12px 36px rgba(6,95,70,.12);transform:translateY(-4px)}
+.price-card.premium{background:var(--green);color:#fff;box-shadow:0 12px 40px rgba(6,95,70,.35)}
+.price-card.premium:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(6,95,70,.45)}
+.price-card{transition:all .3s}
+.popular-badge{position:absolute;top:1.25rem;right:1.25rem;background:#fbbf24;color:#78350f;font-size:.7rem;font-weight:900;padding:.3rem .8rem;border-radius:999px}
+.plan-type{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:.7;margin-bottom:.25rem}
+.plan-name{font-size:1.4rem;font-weight:900;margin-bottom:.25rem}
+.plan-price{font-size:2.6rem;font-weight:900;margin:.75rem 0}
+.plan-price span{font-size:.9rem;font-weight:500;opacity:.6}
+.meds-note{font-size:.75rem;font-weight:600;padding:.5rem .85rem;border-radius:.75rem;margin-bottom:1.5rem}
+.standard .meds-note{background:#fef3c7;color:#92400e}
+.premium .meds-note{background:rgba(255,255,255,.1);color:#fde68a}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem}
+.plan-features li{display:flex;align-items:flex-start;gap:.65rem;font-size:.875rem;line-height:1.5}
+.standard .plan-features li{color:#475569}
+.premium .plan-features li{color:#d1fae5}
+.check-green{color:var(--green);flex-shrink:0;margin-top:1px}
+.check-gold{color:#fcd34d;flex-shrink:0;margin-top:1px}
+.plan-btn{display:block;text-align:center;font-weight:700;padding:.9rem;border-radius:.9rem;font-size:.95rem;text-decoration:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;width:100%}
+.standard .plan-btn{border:2px solid var(--green);color:var(--green);background:transparent}
+.standard .plan-btn:hover{background:var(--green4)}
+.premium .plan-btn{background:#fff;color:var(--green)}
+.premium .plan-btn:hover{background:#f0fdf4}
+.price-note{text-align:center;font-size:.78rem;color:var(--gray);margin-top:1.5rem}
 
-  useEffect(() => {
-    const t = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
-    return () => clearInterval(t);
-  }, []);
+/* ── TESTIMONIALS ── */
+#testimonials{background:#fff}
+.testi-featured{background:var(--green);color:#fff;border-radius:1.5rem;padding:2.5rem;position:relative;overflow:hidden;margin-bottom:1.75rem}
+.stars{display:flex;gap:2px;margin-bottom:1rem}
+.star{color:#fbbf24;font-size:1rem}
+.testi-quote{font-size:clamp(.95rem,2vw,1.15rem);font-weight:500;line-height:1.8;color:#d1fae5;margin-bottom:1.75rem}
+.testi-author{display:flex;align-items:center;gap:1rem}
+.testi-avatar{width:48px;height:48px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#fff;flex-shrink:0}
+.testi-name{font-weight:700;font-size:1rem}
+.testi-loc{color:#6ee7b7;font-size:.8rem;margin-top:.15rem}
+.testi-dots{display:flex;gap:.5rem;margin-top:1.5rem}
+.testi-dot{height:8px;border-radius:999px;background:#6ee7b7;cursor:pointer;transition:all .4s;border:none}
+.testi-dot.active{width:32px;background:#fff}
+.testi-dot:not(.active){width:8px}
+.testi-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.testi-mini{border-radius:1rem;border:2px solid #e2e8f0;padding:1.25rem;cursor:pointer;transition:all .2s}
+.testi-mini.active{border-color:var(--green);background:var(--green4)}
+.testi-mini:hover:not(.active){border-color:#a7f3d0}
+.mini-stars{display:flex;gap:2px;margin-bottom:.5rem}
+.mini-quote{font-size:.75rem;color:var(--gray);line-height:1.6;margin-bottom:.65rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.mini-name{font-size:.8rem;font-weight:700;color:var(--slate)}
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
-    setFormData({ name: "", phone: "", message: "" });
-  };
+/* ── CONTACT ── */
+#contact{background:linear-gradient(135deg,#f0fdf4,#f8fafc)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.contact-card{display:flex;align-items:center;gap:1rem;background:#fff;border-radius:1rem;padding:1.1rem 1.25rem;border:1.5px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04);text-decoration:none;transition:all .25s;margin-bottom:.85rem}
+.contact-card:hover{box-shadow:0 8px 24px rgba(6,95,70,.12);transform:translateY(-2px)}
+.contact-icon{width:44px;height:44px;border-radius:.75rem;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-label{font-size:.72rem;color:var(--gray);font-weight:600;margin-bottom:.15rem}
+.contact-val{font-size:.9rem;font-weight:700;color:var(--slate)}
+.contact-card:hover .contact-val{color:var(--green)}
+.contact-arrow{margin-left:auto;color:#cbd5e1;transition:color .2s}
+.contact-card:hover .contact-arrow{color:var(--green)}
+.map-wrap{border-radius:1.25rem;overflow:hidden;border:1.5px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.05);height:220px}
+.map-wrap iframe{width:100%;height:100%;border:0;display:block}
+.form-box{background:#fff;border-radius:1.5rem;border:1.5px solid #e2e8f0;box-shadow:0 2px 16px rgba(0,0,0,.06);padding:2.25rem}
+.form-title{font-size:1.2rem;font-weight:800;color:var(--slate);margin-bottom:1.5rem}
+.form-group{margin-bottom:1.1rem}
+.form-label{display:block;font-size:.82rem;font-weight:600;color:#475569;margin-bottom:.4rem}
+.form-input,.form-textarea{width:100%;border:1.5px solid #e2e8f0;border-radius:.85rem;padding:.8rem 1rem;font-size:.9rem;font-family:'Inter',sans-serif;color:var(--slate);outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(6,95,70,.1)}
+.form-textarea{resize:none;height:110px}
+.form-submit{width:100%;background:var(--green);color:#fff;border:none;border-radius:.85rem;padding:1rem;font-size:.95rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.form-submit:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(6,95,70,.35)}
+.form-note{text-align:center;font-size:.75rem;color:var(--gray);margin-top:.75rem}
+.success-msg{display:none;flex-direction:column;align-items:center;justify-content:center;height:200px;text-align:center}
+.success-msg svg{color:var(--green);margin-bottom:.75rem}
+.success-msg h4{font-weight:800;font-size:1.1rem;color:var(--slate)}
+.success-msg p{color:var(--gray);font-size:.85rem;margin-top:.35rem}
 
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-  };
+/* ── FOOTER ── */
+footer{background:var(--green);color:#fff;padding:3rem 0 1.5rem}
+.footer-inner{text-align:center}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:.75rem}
+.footer-motto{color:#6ee7b7;font-size:.9rem;margin-bottom:.35rem}
+.footer-addr{color:#a7f3d0;font-size:.8rem}
+.footer-divider{border:none;border-top:1px solid rgba(255,255,255,.15);margin:1.5rem 0 1rem}
+.footer-copy{font-size:.75rem;color:#6ee7b7}
 
-  return (
-    <div className="font-sans text-gray-800 overflow-x-hidden" style={{ fontFamily: "'Inter', 'Montserrat', sans-serif" }}>
+/* ── FLOATING BTNS ── */
+.float-btns{position:fixed;bottom:1.5rem;right:1.5rem;z-index:998;display:flex;flex-direction:column;gap:.75rem}
+.float-btn{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 6px 20px rgba(0,0,0,.2);transition:transform .2s,box-shadow .2s}
+.float-btn:hover{transform:scale(1.1);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.float-wa{background:#25D366}
+.float-call{background:var(--green);animation:bounce2 2s infinite}
+@keyframes bounce2{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.float-call:hover{animation:none}
 
-      {/* ── STICKY NAV ── */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-lg" : "bg-white/90 backdrop-blur"}`}>
-        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo("hero")}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow" style={{ background: EMERALD }}>
-              <Heart size={20} className="text-white fill-white" />
-            </div>
-            <div className="leading-tight">
-              <p className="font-bold text-sm" style={{ color: EMERALD }}>রাহবার</p>
-              <p className="text-xs text-slate-500 hidden sm:block">মাদকশক্তি নিরাময় কেন্দ্র</p>
-            </div>
-          </div>
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav-links,.nav-emergency{display:none}
+  .hamburger{display:flex}
+  .grid-2,.grid-3,.testi-cards,.contact-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column;align-items:center}
+  .section{padding:3.5rem 0}
+}
+@media(max-width:480px){
+  .logo-text p:last-child{display:none}
+  .trust-row span{font-size:.75rem}
+}
+</style>
+</head>
+<body>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            {NAV.map((n, i) => (
-              <button key={i} onClick={() => scrollTo(["services","pricing","testimonials","contact"][i])}
-                className="text-sm font-medium text-gray-600 hover:text-emerald-700 transition-colors">
-                {n}
-              </button>
-            ))}
-          </nav>
-
-          {/* Emergency CTA */}
-          <div className="flex items-center gap-2">
-            <a href={`tel:${PHONE}`}
-              className="hidden sm:flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow hover:opacity-90 transition-all"
-              style={{ background: EMERALD }}>
-              <Phone size={14} className="animate-pulse" /> জরুরি কল
-            </a>
-            <button className="md:hidden p-2 rounded-lg" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
+<!-- ══ NAVBAR ══ -->
+<header id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a class="logo" href="#hero">
+        <div class="logo-icon">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 12.5-9 12.5z" fill="white"/></svg>
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-white border-t px-4 py-4 flex flex-col gap-3 shadow-lg">
-            {NAV.map((n, i) => (
-              <button key={i} onClick={() => scrollTo(["services","pricing","testimonials","contact"][i])}
-                className="text-left text-sm font-medium py-2 border-b border-gray-100 text-gray-700">{n}</button>
-            ))}
-            <a href={`tel:${PHONE}`} className="flex items-center justify-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl mt-1"
-              style={{ background: EMERALD }}>
-              <Phone size={14} /> জরুরি কল করুন
-            </a>
-          </div>
-        )}
-      </header>
-
-      {/* ── HERO ── */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
-        style={{ background: "linear-gradient(135deg, #ecfdf5 0%, #f0f9ff 50%, #f8fafc 100%)" }}>
-        <GeoBg opacity={0.05} />
-        {/* Blurred decorative circles */}
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: EMERALD }} />
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-10 blur-3xl bg-blue-400" />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white border border-emerald-200 text-emerald-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm mb-6">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            ২৪/৭ চিকিৎসা সেবা উপলব্ধ
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-4" style={{ color: EMERALD }}>
-            রাহবার মাদকশক্তি
-            <br /><span className="text-slate-700">নিরাময় কেন্দ্র</span>
-          </h1>
-
-          {/* Motto */}
-          <div className="relative inline-block my-6">
-            <div className="absolute inset-0 blur-sm opacity-30 rounded-2xl" style={{ background: EMERALD }} />
-            <p className="relative text-xl sm:text-2xl font-bold text-white px-6 py-3 rounded-2xl"
-              style={{ background: EMERALD }}>
-              আঁধার নয়, জীবন হোক আলোকময়
-            </p>
-          </div>
-
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
-            বিশেষজ্ঞ চিকিৎসক, ইসলামিক কাউন্সেলিং এবং আধুনিক থেরাপির মাধ্যমে মাদকমুক্ত সুন্দর জীবনের পথে আপনাকে সহযোগিতা করি।
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={`tel:${PHONE}`}
-              className="flex items-center justify-center gap-2 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-base"
-              style={{ background: EMERALD }}>
-              <Phone size={18} /> এখনই ফোন করুন
-            </a>
-            <button onClick={() => scrollTo("services")}
-              className="flex items-center justify-center gap-2 text-emerald-700 font-bold px-8 py-4 rounded-xl border-2 border-emerald-600 hover:bg-emerald-50 transition-all text-base">
-              আমাদের সেবা দেখুন <ChevronRight size={18} />
-            </button>
-          </div>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap justify-center gap-6 mt-12 text-sm text-gray-500">
-            {[["✅","লাইসেন্সপ্রাপ্ত কেন্দ্র"],["🕌","ইসলামিক পদ্ধতি"],["👨‍⚕️","বিশেষজ্ঞ টিম"],["🔒","সম্পূর্ণ গোপনীয়"]].map(([e,t],i)=>(
-              <span key={i} className="flex items-center gap-1">{e} {t}</span>
-            ))}
-          </div>
+        <div class="logo-text">
+          <p>রাহবার</p>
+          <p>মাদকশক্তি নিরাময় কেন্দ্র</p>
         </div>
-      </section>
+      </a>
+      <nav class="nav-links">
+        <a href="#services">সেবা</a>
+        <a href="#pricing">মূল্য তালিকা</a>
+        <a href="#testimonials">সাফল্যের গল্প</a>
+        <a href="#contact">যোগাযোগ</a>
+      </nav>
+      <a href="tel:+8801700000000" class="nav-emergency">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.27 19a19.45 19.45 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91A16 16 0 0 0 14 15.85l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        জরুরি কল
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#services" class="mob-link">সেবা</a>
+    <a href="#pricing" class="mob-link">মূল্য তালিকা</a>
+    <a href="#testimonials" class="mob-link">সাফল্যের গল্প</a>
+    <a href="#contact" class="mob-link">যোগাযোগ</a>
+    <a href="tel:+8801700000000" class="mobile-emergency">📞 জরুরি কল করুন</a>
+  </div>
+</header>
 
-      {/* ── SERVICES ── */}
-      <section id="services" className="relative py-20 bg-white overflow-hidden">
-        <GeoBg opacity={0.03} />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">আমাদের সেবা</span>
-            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">সামগ্রিক নিরাময় পদ্ধতি</h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto">আমরা বিশ্বাস করি, শরীর, মন ও আত্মার সম্মিলিত চিকিৎসাই পূর্ণ আরোগ্যের পথ।</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s, i) => (
-              <div key={i} className="group relative rounded-2xl border border-gray-100 bg-white p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 rounded-bl-full opacity-10 transition-all group-hover:opacity-20"
-                  style={{ background: s.color || EMERALD }} />
-                <div className="w-13 h-13 w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow"
-                  style={{ background: s.color || EMERALD }}>
-                  <s.icon size={22} className="text-white" />
-                </div>
-                <h3 className="font-bold text-lg text-slate-800 mb-2">{s.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">{s.desc}</p>
-                <div className="flex flex-wrap gap-2">
-                  {s.tags.map((t, j) => (
-                    <span key={j} className="text-xs font-medium px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section id="pricing" className="relative py-20 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%)" }}>
-        <GeoBg opacity={0.04} />
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">মূল্য তালিকা</span>
-            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">চিকিৎসা প্যাকেজ</h2>
-            <p className="text-gray-500 mt-3">সকল প্যাকেজে বিশেষজ্ঞ চিকিৎসা, ইসলামিক কাউন্সেলিং ও নিয়মিত মনিটরিং অন্তর্ভুক্ত।</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Non-AC */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 shadow-sm hover:shadow-lg transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">স্ট্যান্ডার্ড</span>
-              </div>
-              <h3 className="text-2xl font-black text-slate-800 mb-1">নন-এসি কেবিন</h3>
-              <div className="flex items-end gap-1 my-4">
-                <span className="text-4xl font-black" style={{ color: EMERALD }}>৳৫০,০০০</span>
-                <span className="text-gray-400 mb-1 text-sm">/ মাস</span>
-              </div>
-              <p className="text-xs text-amber-600 font-medium bg-amber-50 rounded-lg px-3 py-2 mb-6">
-                ⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য
-              </p>
-              <ul className="space-y-3 mb-8">
-                {planFeatures.map((f, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
-                    <CheckCircle size={16} className="mt-0.5 shrink-0" style={{ color: EMERALD }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a href={`tel:${PHONE}`}
-                className="block text-center font-bold py-3 rounded-xl border-2 text-emerald-700 border-emerald-600 hover:bg-emerald-50 transition-all">
-                ভর্তির জন্য যোগাযোগ করুন
-              </a>
-            </div>
-
-            {/* AC – highlighted */}
-            <div className="rounded-2xl p-8 shadow-xl relative overflow-hidden hover:shadow-2xl transition-all"
-              style={{ background: EMERALD }}>
-              <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-full">
-                জনপ্রিয়
-              </div>
-              <GeoBg opacity={0.04} />
-              <div className="relative z-10">
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-200">প্রিমিয়াম</span>
-                <h3 className="text-2xl font-black text-white mt-1 mb-1">এসি কেবিন</h3>
-                <div className="flex items-end gap-1 my-4">
-                  <span className="text-4xl font-black text-white">৳৬০,০০০</span>
-                  <span className="text-emerald-200 mb-1 text-sm">/ মাস</span>
-                </div>
-                <p className="text-xs text-yellow-300 font-medium bg-emerald-800/50 rounded-lg px-3 py-2 mb-6">
-                  ⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য
-                </p>
-                <ul className="space-y-3 mb-8">
-                  {[...planFeatures, "এয়ার কন্ডিশনড কেবিন", "উন্নত গোপনীয়তা সুবিধা"].map((f, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-emerald-100">
-                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-yellow-300" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a href={`tel:${PHONE}`}
-                  className="block text-center font-bold py-3 rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all">
-                  ভর্তির জন্য যোগাযোগ করুন
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-center text-gray-400 text-xs mt-6">
-            * বিস্তারিত জানতে সরাসরি যোগাযোগ করুন। মূল্য পরিবর্তনযোগ্য।
-          </p>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" className="relative py-20 bg-white overflow-hidden">
-        <GeoBg opacity={0.03} />
-        <div className="relative z-10 max-w-5xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">সাফল্যের গল্প</span>
-            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">যারা ফিরে পেয়েছেন আলো</h2>
-            <p className="text-gray-500 mt-3">তাঁদের সাহসী যাত্রা, আমাদের অনুপ্রেরণা।</p>
-          </div>
-
-          {/* Featured */}
-          <div className="rounded-2xl p-8 sm:p-10 mb-8 relative overflow-hidden text-white"
-            style={{ background: EMERALD }}>
-            <GeoBg opacity={0.05} />
-            <div className="relative z-10">
-              <div className="flex gap-1 mb-4"><Stars /></div>
-              <p className="text-lg sm:text-xl font-medium leading-relaxed mb-6 text-emerald-50">
-                "{testimonials[activeTestimonial].quote}"
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center text-xl font-black">
-                  {testimonials[activeTestimonial].name[0]}
-                </div>
-                <div>
-                  <p className="font-bold">{testimonials[activeTestimonial].name}</p>
-                  <p className="text-emerald-300 text-sm">{testimonials[activeTestimonial].location} · {testimonials[activeTestimonial].date}</p>
-                </div>
-              </div>
-              <div className="flex gap-2 mt-6">
-                {testimonials.map((_, i) => (
-                  <button key={i} onClick={() => setActiveTestimonial(i)}
-                    className={`h-2 rounded-full transition-all ${i === activeTestimonial ? "w-8 bg-white" : "w-2 bg-emerald-400"}`} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} onClick={() => setActiveTestimonial(i)}
-                className={`rounded-xl p-5 border-2 cursor-pointer transition-all ${i === activeTestimonial ? "border-emerald-500 bg-emerald-50" : "border-gray-100 bg-white hover:border-emerald-200"}`}>
-                <div className="flex gap-1 mb-2"><Stars n={5} /></div>
-                <p className="text-xs text-gray-500 line-clamp-3 mb-3">"{t.quote}"</p>
-                <p className="text-xs font-bold text-slate-700">{t.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CONTACT ── */}
-      <section id="contact" className="relative py-20 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%)" }}>
-        <GeoBg opacity={0.04} />
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">যোগাযোগ</span>
-            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">আজই প্রথম পদক্ষেপ নিন</h2>
-            <p className="text-gray-500 mt-3">সাহায্যের জন্য পৌঁছানোই সাহসিকতার প্রথম চিহ্ন।</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Info */}
-            <div className="space-y-6">
-              {/* Contact cards */}
-              {[
-                { icon: Phone, label: "ফোন / হেল্পলাইন", val: PHONE, href: `tel:${PHONE}` },
-                { icon: Mail, label: "ইমেইল", val: EMAIL, href: `mailto:${EMAIL}` },
-                { icon: MapPin, label: "ঠিকানা", val: ADDRESS, href: "#" },
-              ].map((c, i) => (
-                <a key={i} href={c.href}
-                  className="flex items-center gap-4 bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group">
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: EMERALD }}>
-                    <c.icon size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-medium">{c.label}</p>
-                    <p className="font-semibold text-slate-700 group-hover:text-emerald-700 transition-colors">{c.val}</p>
-                  </div>
-                  <ArrowRight size={16} className="ml-auto text-gray-300 group-hover:text-emerald-500 transition-colors" />
-                </a>
-              ))}
-
-              {/* Map embed */}
-              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-56">
-                <iframe
-                  title="Rahbar Kendro Location"
-                  width="100%" height="100%"
-                  src="https://maps.google.com/maps?q=23.8746,90.3928&z=15&output=embed"
-                  style={{ border: 0 }} allowFullScreen loading="lazy"
-                />
-              </div>
-            </div>
-
-            {/* Form */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-              <h3 className="font-bold text-xl text-slate-800 mb-6">বার্তা পাঠান</h3>
-              {submitted ? (
-                <div className="flex flex-col items-center justify-center h-48 text-center">
-                  <CheckCircle size={48} className="mb-3" style={{ color: EMERALD }} />
-                  <p className="font-bold text-slate-700 text-lg">বার্তা পাঠানো হয়েছে!</p>
-                  <p className="text-gray-500 text-sm mt-1">আমরা শীঘ্রই যোগাযোগ করব।</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {[
-                    { id: "name", label: "আপনার নাম", type: "text", placeholder: "মোহাম্মদ রহিম" },
-                    { id: "phone", label: "ফোন নম্বর", type: "tel", placeholder: "+8801XXXXXXXXX" },
-                  ].map(f => (
-                    <div key={f.id}>
-                      <label className="text-sm font-semibold text-gray-600 mb-1 block">{f.label}</label>
-                      <input type={f.type} placeholder={f.placeholder}
-                        value={formData[f.id]}
-                        onChange={e => setFormData(p => ({ ...p, [f.id]: e.target.value }))}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
-                    </div>
-                  ))}
-                  <div>
-                    <label className="text-sm font-semibold text-gray-600 mb-1 block">বার্তা</label>
-                    <textarea rows={4} placeholder="আপনার সমস্যা বা প্রশ্ন লিখুন..."
-                      value={formData.message}
-                      onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition resize-none" />
-                  </div>
-                  <button onClick={handleSubmit}
-                    className="w-full text-white font-bold py-3.5 rounded-xl hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-md"
-                    style={{ background: EMERALD }}>
-                    বার্তা পাঠান →
-                  </button>
-                  <p className="text-center text-xs text-gray-400">🔒 আপনার তথ্য সম্পূর্ণ গোপন রাখা হবে</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="text-white py-10" style={{ background: EMERALD }}>
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Heart size={20} className="fill-white" />
-            <span className="font-black text-lg">রাহবার মাদকশক্তি নিরাময় কেন্দ্র</span>
-          </div>
-          <p className="text-emerald-200 text-sm mb-1">আঁধার নয়, জীবন হোক আলোকময়</p>
-          <p className="text-emerald-300 text-xs">{ADDRESS}</p>
-          <div className="border-t border-emerald-700 mt-6 pt-4 text-xs text-emerald-400">
-            © 2025 Rahbar Madokshakti Niramoy Kendro · সর্বস্বত্ব সংরক্ষিত
-          </div>
-        </div>
-      </footer>
-
-      {/* ── FLOATING WHATSAPP / CALL ── */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-        <a href="https://wa.me/8801700000000" target="_blank" rel="noreferrer"
-          className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all bg-green-500 text-white"
-          title="WhatsApp">
-          <MessageCircle size={26} className="fill-white" />
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <!-- SVG geometric bg -->
+  <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p1" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" stroke-width="1"/><polygon points="30,12 48,21 48,39 30,48 12,39 12,21" fill="none" stroke="#065f46" stroke-width="0.5"/><circle cx="30" cy="30" r="2.5" fill="#065f46"/></pattern></defs><rect width="100%" height="100%" fill="url(#p1)"/></svg>
+  <div class="hero-blob1"></div>
+  <div class="hero-blob2"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        ২৪/৭ চিকিৎসা সেবা উপলব্ধ
+      </div>
+      <h1 class="hero-h1">রাহবার মাদকশক্তি<br><span>নিরাময় কেন্দ্র</span></h1>
+      <div class="motto-wrap">
+        <div class="motto-pill">আঁধার নয়, জীবন হোক আলোকময়</div>
+      </div>
+      <p class="hero-desc">বিশেষজ্ঞ চিকিৎসক, ইসলামিক কাউন্সেলিং এবং আধুনিক থেরাপির মাধ্যমে মাদকমুক্ত সুন্দর জীবনের পথে আপনাকে সহযোগিতা করি।</p>
+      <div class="hero-btns">
+        <a href="tel:+8801700000000" class="btn btn-primary">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.27 19a19.45 19.45 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91A16 16 0 0 0 14 15.85l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          এখনই ফোন করুন
         </a>
-        <a href={`tel:${PHONE}`}
-          className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all text-white animate-bounce"
-          style={{ background: EMERALD }}
-          title="জরুরি কল">
-          <Phone size={24} />
+        <a href="#services" class="btn btn-outline">
+          আমাদের সেবা দেখুন
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
       </div>
-
+      <div class="trust-row">
+        <span>✅ লাইসেন্সপ্রাপ্ত কেন্দ্র</span>
+        <span>🕌 ইসলামিক পদ্ধতি</span>
+        <span>👨‍⚕️ বিশেষজ্ঞ টিম</span>
+        <span>🔒 সম্পূর্ণ গোপনীয়</span>
+      </div>
     </div>
-  );
-}
+  </div>
+</section>
 
+<!-- ══ SERVICES ══ -->
+<section id="services" class="section">
+  <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p2" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" stroke-width="1"/><circle cx="30" cy="30" r="2" fill="#065f46"/></pattern></defs><rect width="100%" height="100%" fill="url(#p2)"/></svg>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-head">
+      <span class="section-label">আমাদের সেবা</span>
+      <h2 class="section-title">সামগ্রিক নিরাময় পদ্ধতি</h2>
+      <p class="section-sub">আমরা বিশ্বাস করি, শরীর, মন ও আত্মার সম্মিলিত চিকিৎসাই পূর্ণ আরোগ্যের পথ।</p>
+    </div>
+    <div class="grid-3" id="servicesGrid"></div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section id="pricing" class="section">
+  <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p3" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" stroke-width="0.8"/></pattern></defs><rect width="100%" height="100%" fill="url(#p3)"/></svg>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-head">
+      <span class="section-label">মূল্য তালিকা</span>
+      <h2 class="section-title">চিকিৎসা প্যাকেজ</h2>
+      <p class="section-sub">সকল প্যাকেজে বিশেষজ্ঞ চিকিৎসা, ইসলামিক কাউন্সেলিং ও নিয়মিত মনিটরিং অন্তর্ভুক্ত।</p>
+    </div>
+    <div class="grid-2">
+      <!-- Non-AC -->
+      <div class="price-card standard">
+        <p class="plan-type">স্ট্যান্ডার্ড</p>
+        <h3 class="plan-name" style="color:var(--slate)">নন-এসি কেবিন</h3>
+        <div class="plan-price" style="color:var(--green)">৳৫০,০০০ <span>/ মাস</span></div>
+        <p class="meds-note">⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য</p>
+        <ul class="plan-features" id="std-features"></ul>
+        <a href="tel:+8801700000000" class="plan-btn">ভর্তির জন্য যোগাযোগ করুন</a>
+      </div>
+      <!-- AC -->
+      <div class="price-card premium" style="position:relative">
+        <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p4" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="white" stroke-width="0.6"/></pattern></defs><rect width="100%" height="100%" fill="url(#p4)"/></svg>
+        <div class="popular-badge">জনপ্রিয়</div>
+        <div style="position:relative;z-index:1">
+          <p class="plan-type">প্রিমিয়াম</p>
+          <h3 class="plan-name">এসি কেবিন</h3>
+          <div class="plan-price">৳৬০,০০০ <span>/ মাস</span></div>
+          <p class="meds-note">⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য</p>
+          <ul class="plan-features" id="prem-features"></ul>
+          <a href="tel:+8801700000000" class="plan-btn">ভর্তির জন্য যোগাযোগ করুন</a>
+        </div>
+      </div>
+    </div>
+    <p class="price-note">* বিস্তারিত জানতে সরাসরি যোগাযোগ করুন। মূল্য পরিবর্তনযোগ্য।</p>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section id="testimonials" class="section">
+  <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p5" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" stroke-width="0.7"/></pattern></defs><rect width="100%" height="100%" fill="url(p5)"/></svg>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-head">
+      <span class="section-label">সাফল্যের গল্প</span>
+      <h2 class="section-title">যারা ফিরে পেয়েছেন আলো</h2>
+      <p class="section-sub">তাঁদের সাহসী যাত্রা, আমাদের অনুপ্রেরণা।</p>
+    </div>
+    <!-- Featured -->
+    <div class="testi-featured">
+      <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p6" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="white" stroke-width="0.6"/></pattern></defs><rect width="100%" height="100%" fill="url(#p6)"/></svg>
+      <div style="position:relative;z-index:1">
+        <div class="stars" id="featStars"></div>
+        <p class="testi-quote" id="featQuote"></p>
+        <div class="testi-author">
+          <div class="testi-avatar" id="featAvatar"></div>
+          <div>
+            <p class="testi-name" id="featName"></p>
+            <p class="testi-loc" id="featLoc"></p>
+          </div>
+        </div>
+        <div class="testi-dots" id="testiDots"></div>
+      </div>
+    </div>
+    <!-- Mini cards -->
+    <div class="testi-cards" id="testiCards"></div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact" class="section">
+  <svg class="geo" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="p7" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse"><polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" stroke-width="0.7"/></pattern></defs><rect width="100%" height="100%" fill="url(#p7)"/></svg>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-head">
+      <span class="section-label">যোগাযোগ</span>
+      <h2 class="section-title">আজই প্রথম পদক্ষেপ নিন</h2>
+      <p class="section-sub">সাহায্যের জন্য পৌঁছানোই সাহসিকতার প্রথম চিহ্ন।</p>
+    </div>
+    <div class="contact-grid">
+      <!-- Left -->
+      <div>
+        <a href="tel:+8801700000000" class="contact-card">
+          <div class="contact-icon">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.27 19a19.45 19.45 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91A16 16 0 0 0 14 15.85l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">ফোন / হেল্পলাইন</p>
+            <p class="contact-val">+8801700000000</p>
+          </div>
+          <svg class="contact-arrow" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a href="mailto:info@rahbarkendro.org" class="contact-card">
+          <div class="contact-icon">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">ইমেইল</p>
+            <p class="contact-val">info@rahbarkendro.org</p>
+          </div>
+          <svg class="contact-arrow" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a href="#" class="contact-card">
+          <div class="contact-icon">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <p class="contact-label">ঠিকানা</p>
+            <p class="contact-val">উত্তরা, ঢাকা, বাংলাদেশ</p>
+          </div>
+          <svg class="contact-arrow" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <div class="map-wrap">
+          <iframe src="https://maps.google.com/maps?q=23.8746,90.3928&z=15&output=embed" allowfullscreen loading="lazy" title="রাহবার কেন্দ্রের অবস্থান"></iframe>
+        </div>
+      </div>
+      <!-- Right: form -->
+      <div class="form-box">
+        <h3 class="form-title">বার্তা পাঠান</h3>
+        <div id="successMsg" class="success-msg">
+          <svg width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <h4>বার্তা পাঠানো হয়েছে!</h4>
+          <p>আমরা শীঘ্রই যোগাযোগ করব।</p>
+        </div>
+        <div id="contactForm">
+          <div class="form-group">
+            <label class="form-label" for="fname">আপনার নাম</label>
+            <input class="form-input" id="fname" type="text" placeholder="মোহাম্মদ রহিম"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fphone">ফোন নম্বর</label>
+            <input class="form-input" id="fphone" type="tel" placeholder="+8801XXXXXXXXX"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fmsg">বার্তা</label>
+            <textarea class="form-textarea" id="fmsg" placeholder="আপনার সমস্যা বা প্রশ্ন লিখুন..."></textarea>
+          </div>
+          <button class="form-submit" id="formBtn">
+            বার্তা পাঠান
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <p class="form-note">🔒 আপনার তথ্য সম্পূর্ণ গোপন রাখা হবে</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="logo-icon" style="background:rgba(255,255,255,.2)">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 12.5-9 12.5z" fill="white"/></svg>
+        </div>
+        <span style="font-weight:900;font-size:1.1rem">রাহবার মাদকশক্তি নিরাময় কেন্দ্র</span>
+      </div>
+      <p class="footer-motto">আঁধার নয়, জীবন হোক আলোকময়</p>
+      <p class="footer-addr">উত্তরা, ঢাকা, বাংলাদেশ</p>
+      <hr class="footer-divider"/>
+      <p class="footer-copy">© 2025 Rahbar Madokshakti Niramoy Kendro · সর্বস্বত্ব সংরক্ষিত</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ FLOATING BTNS ══ -->
+<div class="float-btns">
+  <a href="https://wa.me/8801700000000" target="_blank" rel="noreferrer" class="float-btn float-wa" title="WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+  </a>
+  <a href="tel:+8801700000000" class="float-btn float-call" title="জরুরি কল">
+    <svg width="26" height="26" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.27 19a19.45 19.45 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91A16 16 0 0 0 14 15.85l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+  </a>
+</div>
+
+<script>
 // ── DATA ──
 const services = [
-  {
-    icon: Camera,
-    title: "২৪/৭ সিসিটিভি নজরদারি",
-    desc: "রোগীর সুরক্ষা ও নিরাপত্তায় সার্বক্ষণিক ক্যামেরা পর্যবেক্ষণ ব্যবস্থা বজায় রাখা হয়।",
-    color: "#0f766e",
-    tags: ["নিরাপত্তা", "সার্বক্ষণিক"],
-  },
-  {
-    icon: UserCheck,
-    title: "বিশেষজ্ঞ চিকিৎসক দল",
-    desc: "মনোরোগ বিশেষজ্ঞ, ক্লিনিক্যাল সাইকোলজিস্ট এবং অ্যাডিকশন কাউন্সেলর দ্বারা সমন্বিত চিকিৎসা।",
-    color: "#065f46",
-    tags: ["মনোরোগ", "কাউন্সেলিং", "ডিটক্স"],
-  },
-  {
-    icon: BookOpen,
-    title: "কুরআন ও নামাজ প্রশিক্ষণ",
-    desc: "আত্মিক পুনর্জাগরণের জন্য নিয়মিত কুরআন তিলাওয়াত, নামাজ ও ইসলামিক থেরাপি সেশন।",
-    color: "#1e40af",
-    tags: ["ইসলামিক", "কুরআন", "নামাজ"],
-  },
-  {
-    icon: Clock,
-    title: "নিয়মিত ফলো-আপ",
-    desc: "চিকিৎসা শেষেও রোগীর সুস্থতা নিশ্চিত করতে মাসিক ফলো-আপ ও পুনর্বাসন সহায়তা প্রদান।",
-    color: "#7c3aed",
-    tags: ["পুনর্বাসন", "ফলো-আপ"],
-  },
-  {
-    icon: ShieldCheck,
-    title: "সম্পূর্ণ গোপনীয়তা",
-    desc: "রোগীর পরিচয় ও তথ্য সম্পূর্ণ গোপন রাখা হয়। পরিবারের সম্মান আমাদের অগ্রাধিকার।",
-    color: "#b45309",
-    tags: ["গোপনীয়", "বিশ্বাসযোগ্য"],
-  },
-  {
-    icon: Heart,
-    title: "পারিবারিক কাউন্সেলিং",
-    desc: "পরিবারকে সম্পৃক্ত করে আবেগিক সহায়তা ও পুনর্মিলন থেরাপির মাধ্যমে সম্পর্ক পুনর্নির্মাণ।",
-    color: "#be185d",
-    tags: ["পরিবার", "থেরাপি"],
-  },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l-4 4-4-4"/><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`, title:"২৪/৭ সিসিটিভি নজরদারি", desc:"রোগীর সুরক্ষা ও নিরাপত্তায় সার্বক্ষণিক ক্যামেরা পর্যবেক্ষণ ব্যবস্থা বজায় রাখা হয়।", color:"#0f766e", tags:["নিরাপত্তা","সার্বক্ষণিক"] },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>`, title:"বিশেষজ্ঞ চিকিৎসক দল", desc:"মনোরোগ বিশেষজ্ঞ, ক্লিনিক্যাল সাইকোলজিস্ট এবং অ্যাডিকশন কাউন্সেলর দ্বারা সমন্বিত চিকিৎসা।", color:"#065f46", tags:["মনোরোগ","কাউন্সেলিং","ডিটক্স"] },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`, title:"কুরআন ও নামাজ প্রশিক্ষণ", desc:"আত্মিক পুনর্জাগরণের জন্য নিয়মিত কুরআন তিলাওয়াত, নামাজ ও ইসলামিক থেরাপি সেশন।", color:"#1e40af", tags:["ইসলামিক","কুরআন","নামাজ"] },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, title:"নিয়মিত ফলো-আপ", desc:"চিকিৎসা শেষেও রোগীর সুস্থতা নিশ্চিত করতে মাসিক ফলো-আপ ও পুনর্বাসন সহায়তা প্রদান।", color:"#7c3aed", tags:["পুনর্বাসন","ফলো-আপ"] },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`, title:"সম্পূর্ণ গোপনীয়তা", desc:"রোগীর পরিচয় ও তথ্য সম্পূর্ণ গোপন রাখা হয়। পরিবারের সম্মান আমাদের অগ্রাধিকার।", color:"#b45309", tags:["গোপনীয়","বিশ্বাসযোগ্য"] },
+  { icon: `<svg width="22" height="22" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`, title:"পারিবারিক কাউন্সেলিং", desc:"পরিবারকে সম্পৃক্ত করে আবেগিক সহায়তা ও পুনর্মিলন থেরাপির মাধ্যমে সম্পর্ক পুনর্নির্মাণ।", color:"#be185d", tags:["পরিবার","থেরাপি"] },
 ];
 
-const planFeatures = [
-  "বিশেষজ্ঞ চিকিৎসক পরিদর্শন",
-  "ইসলামিক কাউন্সেলিং সেশন",
-  "ডিটক্সিফিকেশন প্রোগ্রাম",
-  "তিনবেলা পুষ্টিকর খাবার",
-  "২৪/৭ নার্সিং সেবা",
-  "কুরআন ও নামাজ প্রশিক্ষণ",
-  "পারিবারিক ভিজিটের সুযোগ",
-];
+const planFeatures = ["বিশেষজ্ঞ চিকিৎসক পরিদর্শন","ইসলামিক কাউন্সেলিং সেশন","ডিটক্সিফিকেশন প্রোগ্রাম","তিনবেলা পুষ্টিকর খাবার","২৪/৭ নার্সিং সেবা","কুরআন ও নামাজ প্রশিক্ষণ","পারিবারিক ভিজিটের সুযোগ"];
 
 const testimonials = [
-  {
-    name: "মোঃ আব্দুল্লাহ",
-    quote: "রাহবার কেন্দ্রে ভর্তি হওয়ার পর থেকে আমার জীবন সম্পূর্ণ বদলে গেছে। ডাক্তার এবং কাউন্সেলরদের অক্লান্ত পরিশ্রম আমাকে নতুন জীবন দিয়েছে। আলহামদুলিল্লাহ, আজ আমি সম্পূর্ণ সুস্থ।",
-    location: "মিরপুর, ঢাকা",
-    date: "মার্চ ২০২৫",
-  },
-  {
-    name: "রাফিয়া বেগম (মা)",
-    quote: "আমার ছেলেকে নিয়ে সম্পূর্ণ হতাশ ছিলাম। রাহবারের ইসলামিক পদ্ধতি এবং পেশাদার চিকিৎসা আমার পরিবারকে ফিরিয়ে দিয়েছে। এই কেন্দ্রকে সারাজীবন মনে রাখব।",
-    location: "নারায়ণগঞ্জ",
-    date: "জানুয়ারি ২০২৫",
-  },
-  {
-    name: "কামরুল হাসান",
-    quote: "৮ বছরের নেশার জীবন থেকে মুক্তি পেয়েছি এখানে। কুরআনের আলো এবং বিশেষজ্ঞ চিকিৎসার সমন্বয় সত্যিই অলৌকিক।",
-    location: "চট্টগ্রাম",
-    date: "নভেম্বর ২০২৪",
-  },
+  { name:"মোঃ আব্দুল্লাহ", quote:"রাহবার কেন্দ্রে ভর্তি হওয়ার পর থেকে আমার জীবন সম্পূর্ণ বদলে গেছে। ডাক্তার এবং কাউন্সেলরদের অক্লান্ত পরিশ্রম আমাকে নতুন জীবন দিয়েছে। আলহামদুলিল্লাহ, আজ আমি সম্পূর্ণ সুস্থ।", loc:"মিরপুর, ঢাকা · মার্চ ২০২৫" },
+  { name:"রাফিয়া বেগম (মা)", quote:"আমার ছেলেকে নিয়ে সম্পূর্ণ হতাশ ছিলাম। রাহবারের ইসলামিক পদ্ধতি এবং পেশাদার চিকিৎসা আমার পরিবারকে ফিরিয়ে দিয়েছে। এই কেন্দ্রকে সারাজীবন মনে রাখব।", loc:"নারায়ণগঞ্জ · জানুয়ারি ২০২৫" },
+  { name:"কামরুল হাসান", quote:"৮ বছরের নেশার জীবন থেকে মুক্তি পেয়েছি এখানে। কুরআনের আলো এবং বিশেষজ্ঞ চিকিৎসার সমন্বয় সত্যিই অলৌকিক।", loc:"চট্টগ্রাম · নভেম্বর ২০২৪" },
 ];
+
+// ── RENDER SERVICES ──
+const sg = document.getElementById('servicesGrid');
+services.forEach(s => {
+  sg.innerHTML += `
+  <div class="card" style="position:relative;overflow:hidden">
+    <div class="card-accent" style="background:${s.color}"></div>
+    <div class="svc-icon" style="background:${s.color}">${s.icon}</div>
+    <h3 class="svc-title">${s.title}</h3>
+    <p class="svc-desc">${s.desc}</p>
+    <div class="svc-tags">${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+  </div>`;
+});
+
+// ── RENDER PLAN FEATURES ──
+const checkGreen = `<svg class="check-green" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+const checkGold = `<svg class="check-gold" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+const stdF = document.getElementById('std-features');
+const premF = document.getElementById('prem-features');
+planFeatures.forEach(f => {
+  stdF.innerHTML += `<li>${checkGreen}<span>${f}</span></li>`;
+  premF.innerHTML += `<li>${checkGold}<span>${f}</span></li>`;
+});
+['এয়ার কন্ডিশনড কেবিন','উন্নত গোপনীয়তা সুবিধা'].forEach(f => {
+  premF.innerHTML += `<li>${checkGold}<span>${f}</span></li>`;
+});
+
+// ── TESTIMONIALS ──
+let activeT = 0;
+const starsHTML = `<span class="star">★</span>`.repeat(5);
+
+function renderTestimonial(i) {
+  const t = testimonials[i];
+  document.getElementById('featQuote').textContent = `"${t.quote}"`;
+  document.getElementById('featName').textContent = t.name;
+  document.getElementById('featLoc').textContent = t.loc;
+  document.getElementById('featAvatar').textContent = t.name[0];
+  document.getElementById('featStars').innerHTML = starsHTML;
+  // Dots
+  document.querySelectorAll('.testi-dot').forEach((d, j) => {
+    d.classList.toggle('active', j === i);
+  });
+  // Mini cards
+  document.querySelectorAll('.testi-mini').forEach((c, j) => {
+    c.classList.toggle('active', j === i);
+  });
+}
+
+// Build dots & cards
+const dotsEl = document.getElementById('testiDots');
+const cardsEl = document.getElementById('testiCards');
+testimonials.forEach((t, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'testi-dot' + (i === 0 ? ' active' : '');
+  btn.addEventListener('click', () => { activeT = i; renderTestimonial(i); });
+  dotsEl.appendChild(btn);
+
+  cardsEl.innerHTML += `
+  <div class="testi-mini${i===0?' active':''}" data-idx="${i}">
+    <div class="mini-stars">${starsHTML}</div>
+    <p class="mini-quote">"${t.quote}"</p>
+    <p class="mini-name">${t.name}</p>
+  </div>`;
+});
+document.querySelectorAll('.testi-mini').forEach(c => {
+  c.addEventListener('click', () => { activeT = +c.dataset.idx; renderTestimonial(activeT); });
+});
+renderTestimonial(0);
+setInterval(() => { activeT = (activeT + 1) % testimonials.length; renderTestimonial(activeT); }, 5000);
+
+// ── NAVBAR SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ── HAMBURGER ──
+const ham = document.getElementById('hamburger');
+const mob = document.getElementById('mobileMenu');
+ham.addEventListener('click', () => {
+  ham.classList.toggle('open');
+  mob.classList.toggle('open');
+});
+document.querySelectorAll('.mob-link,.mobile-emergency').forEach(a => {
+  a.addEventListener('click', () => { ham.classList.remove('open'); mob.classList.remove('open'); });
+});
+
+// ── CONTACT FORM ──
+document.getElementById('formBtn').addEventListener('click', () => {
+  const n = document.getElementById('fname').value.trim();
+  const p = document.getElementById('fphone').value.trim();
+  const m = document.getElementById('fmsg').value.trim();
+  if (!n || !p) { alert('নাম ও ফোন নম্বর দিন।'); return; }
+  document.getElementById('contactForm').style.display = 'none';
+  const s = document.getElementById('successMsg');
+  s.style.display = 'flex';
+  setTimeout(() => {
+    s.style.display = 'none';
+    document.getElementById('contactForm').style.display = 'block';
+    document.getElementById('fname').value = '';
+    document.getElementById('fphone').value = '';
+    document.getElementById('fmsg').value = '';
+  }, 4000);
+});
+</script>
+</body>
+</html>
