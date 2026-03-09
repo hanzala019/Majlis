@@ -1,880 +1,531 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مجلس - Arabian Chat</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
-:root{--gold:#c9a84c;--gold2:#f0d080;--gold3:#8b6914;--dark:#0d0a05;--dark2:#1a1408;--dark3:#241c0c;--dark4:#2e2410;--border:rgba(201,168,76,0.3);--border2:rgba(201,168,76,0.6);--text:#e8d5a3;--text2:#b8a070;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Lora',serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.05) 0%,transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(201,168,76,0.05) 0%,transparent 60%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='0.4' stroke-opacity='0.07'%3E%3Cpolygon points='60,5 72,35 105,35 80,55 90,85 60,67 30,85 40,55 15,35 48,35'/%3E%3Crect x='30' y='30' width='60' height='60' transform='rotate(45 60 60)'/%3E%3Ccircle cx='60' cy='60' r='28'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0;}
-.particle{position:fixed;border-radius:50%;background:rgba(201,168,76,0.15);pointer-events:none;z-index:0;animation:drift linear infinite;}
-@keyframes drift{0%{transform:translateY(100vh) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:0.4;}100%{transform:translateY(-10vh) translateX(50px);opacity:0;}}
-#app{position:relative;z-index:1;}
-header{background:linear-gradient(180deg,rgba(8,5,1,0.99),rgba(15,11,4,0.97));border-bottom:2px solid transparent;border-image:linear-gradient(90deg,transparent,var(--gold),transparent) 1;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:70px;position:sticky;top:0;z-index:100;box-shadow:0 2px 30px rgba(201,168,76,0.2);}
-.logo{font-family:'Amiri',serif;font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer;line-height:1;}
-.logo-sub{font-size:0.6rem;letter-spacing:4px;display:block;font-family:'Lora',serif;font-style:italic;-webkit-text-fill-color:var(--text2);margin-top:2px;text-transform:uppercase;}
-.header-center{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.hijri-date{font-family:'Amiri',serif;font-size:0.82rem;color:var(--gold3);}
-.lang-toggle{display:flex;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
-.lang-toggle button{background:none;border:none;color:var(--text2);padding:4px 12px;font-size:0.75rem;cursor:pointer;font-family:'Lora',serif;transition:all 0.2s;}
-.lang-toggle button.active{background:rgba(201,168,76,0.18);color:var(--gold);}
-.header-right{display:flex;align-items:center;gap:10px;}
-.user-badge{display:flex;align-items:center;gap:8px;background:var(--dark3);border:1px solid var(--border);border-radius:24px;padding:6px 14px 6px 8px;font-size:0.85rem;color:var(--text2);}
-.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--dark);flex-shrink:0;}
-.btn{font-family:'Lora',serif;border:none;cursor:pointer;border-radius:6px;font-size:0.9rem;transition:all 0.2s;}
-.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:var(--dark);padding:10px 20px;font-weight:600;border:1px solid var(--gold2);}
-.btn-gold:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));transform:translateY(-1px);box-shadow:0 4px 15px rgba(201,168,76,0.3);}
-.btn-gold:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.btn-outline{background:transparent;color:var(--gold);padding:9px 18px;border:1px solid var(--border2);}
-.btn-outline:hover{background:rgba(201,168,76,0.1);}
-.btn-danger{background:rgba(192,57,43,0.15);color:#e74c3c;padding:7px 14px;border:1px solid rgba(192,57,43,0.3);font-size:0.8rem;}
-.btn-danger:hover{background:rgba(192,57,43,0.3);}
-.btn-sm{padding:6px 14px;font-size:0.82rem;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(6px);}
-.modal-overlay.hidden{display:none;}
-.modal{background:linear-gradient(160deg,var(--dark3),var(--dark2));border:1px solid var(--border2);border-radius:12px;padding:32px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.9);position:relative;overflow:hidden;}
-.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.modal-geo{position:absolute;top:8px;right:8px;width:40px;height:40px;opacity:0.15;}
-.modal h2{font-family:'Amiri',serif;color:var(--gold);text-align:center;margin-bottom:6px;font-size:1.6rem;letter-spacing:2px;}
-.ornament{text-align:center;color:var(--gold3);margin:0 0 20px;font-size:1rem;letter-spacing:8px;}
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;color:var(--text2);font-size:0.8rem;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
-input[type=text],input[type=password],input[type=email],textarea{width:100%;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:'Lora',serif;font-size:0.9rem;transition:border-color 0.2s;outline:none;}
-input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,0.1);}
-.form-actions{display:flex;gap:10px;margin-top:20px;}
-.form-actions .btn{flex:1;}
-.error-msg{color:#e74c3c;font-size:0.8rem;margin-top:8px;display:none;}
-.error-msg.show{display:block;}
-.divider{text-align:center;color:var(--text2);font-size:0.8rem;margin:16px 0;position:relative;}
-.divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border);}
-.divider::before{left:0;}.divider::after{right:0;}
-.type-toggle{display:flex;gap:0;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:4px;}
-.type-toggle button{flex:1;background:none;border:none;color:var(--text2);padding:8px 12px;font-size:0.82rem;cursor:pointer;font-family:'Lora',serif;transition:all 0.2s;}
-.type-toggle button.active{background:rgba(201,168,76,0.18);color:var(--gold);}
-.type-hint{font-size:0.75rem;color:var(--text2);font-style:italic;margin-bottom:14px;min-height:18px;}
-.room-code-box{background:rgba(0,0,0,0.5);border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;margin-top:16px;}
-.room-code-box p{color:var(--text2);font-size:0.78rem;margin-bottom:8px;}
-.room-code{font-family:'Amiri',serif;font-size:2rem;letter-spacing:8px;color:var(--gold);font-weight:700;}
-.room-code-warn{font-size:0.72rem;color:#e74c3c;margin-top:8px;}
-.page{display:none!important;}.page.active{display:block!important;}
-#page-chat.active{display:flex!important;flex-direction:column;height:calc(100vh - 70px);}
-#page-home{padding:32px 24px;max-width:1100px;margin:0 auto;}
-.home-hero{text-align:center;padding:40px 0 48px;}
-.hero-arch{display:inline-block;padding:32px 48px;position:relative;border:1px solid var(--border);border-radius:60% 60% 0 0/30% 30% 0 0;background:linear-gradient(180deg,rgba(201,168,76,0.04),transparent);margin-bottom:24px;}
-.hero-arch::before{content:'';position:absolute;inset:-8px;border:1px solid rgba(201,168,76,0.1);border-radius:60% 60% 0 0/30% 30% 0 0;}
-.home-hero h1{font-family:'Amiri',serif;font-size:clamp(2rem,6vw,3.5rem);background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;}
-.home-hero h1 span{display:block;font-size:0.45em;letter-spacing:6px;font-family:'Lora',serif;font-style:italic;-webkit-text-fill-color:var(--text2);margin-top:4px;}
-.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
-/* prayer widget */
-.prayer-widget{background:linear-gradient(160deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px;position:relative;overflow:hidden;}
-.prayer-widget::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.prayer-widget-title{font-family:'Amiri',serif;color:var(--gold);font-size:0.95rem;letter-spacing:3px;text-align:center;margin-bottom:14px;}
-.prayer-times-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
-.prayer-time-item{text-align:center;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:rgba(0,0,0,0.2);transition:all 0.3s;}
-.prayer-time-item.next{border-color:var(--gold);background:rgba(201,168,76,0.1);box-shadow:0 0 12px rgba(201,168,76,0.15);}
-.prayer-time-item.next .prayer-name{color:var(--gold);}
-.prayer-name{font-family:'Amiri',serif;font-size:0.8rem;color:var(--text2);display:block;margin-bottom:4px;}
-.prayer-time{font-size:0.85rem;color:var(--text);font-weight:600;}
-.prayer-location{font-size:0.72rem;color:var(--text2);text-align:center;margin-top:8px;font-style:italic;}
-.prayer-loading{text-align:center;color:var(--text2);font-style:italic;padding:10px 0;font-size:0.85rem;}
-/* salah popup */
-.salah-popup{position:fixed;bottom:24px;right:24px;background:linear-gradient(160deg,var(--dark3),var(--dark2));border:1px solid var(--gold);border-radius:12px;padding:16px 20px;z-index:500;max-width:280px;box-shadow:0 8px 32px rgba(201,168,76,0.3);animation:slideUp 0.4s ease;pointer-events:none;}
-.salah-popup::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.salah-popup-icon{font-size:1.4rem;display:block;text-align:center;margin-bottom:6px;}
-.salah-popup-title{font-family:'Amiri',serif;color:var(--gold);font-size:1rem;text-align:center;margin-bottom:4px;}
-.salah-popup-text{font-size:0.8rem;color:var(--text2);text-align:center;line-height:1.5;}
-.salah-popup.fade-out{animation:fadeOut 0.5s ease forwards;}
-@keyframes fadeOut{to{opacity:0;transform:translateY(10px);}}
-/* join private */
-.join-private-bar{display:flex;gap:10px;margin-bottom:20px;align-items:center;}
-.join-private-bar input{flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);font-family:'Lora',serif;font-size:0.9rem;outline:none;letter-spacing:4px;text-transform:uppercase;}
-.join-private-bar input:focus{border-color:var(--gold);}
-.join-private-bar input::placeholder{letter-spacing:1px;text-transform:none;}
-.search-bar{display:flex;gap:10px;margin-bottom:20px;}
-.search-bar input{flex:1;background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-family:'Lora',serif;font-size:0.95rem;outline:none;}
-.search-bar input:focus{border-color:var(--gold);}
-.search-bar input::placeholder{color:var(--text2);}
-.section-title{font-family:'Amiri',serif;color:var(--gold);font-size:1.2rem;letter-spacing:3px;margin-bottom:20px;padding-bottom:10px;display:flex;align-items:center;justify-content:space-between;position:relative;}
-.section-title::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent);}
-.rooms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
-.room-card{background:linear-gradient(170deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:50% 50% 8px 8px/20% 20% 8px 8px;padding:28px 20px 20px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity 0.3s;}
-.room-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 12px 40px rgba(201,168,76,0.18);}
-.room-card:hover::before{opacity:1;}
-.room-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
-.room-name{font-family:'Amiri',serif;color:var(--gold);font-size:1.1rem;}
-.room-desc{color:var(--text2);font-size:0.85rem;font-style:italic;margin-bottom:14px;line-height:1.6;}
-.room-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.room-tag{font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(201,168,76,0.07);border:1px solid var(--border);color:var(--text2);}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text2);grid-column:1/-1;}
-.empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:0.5;}
-.hadith-card{background:linear-gradient(160deg,var(--dark3),var(--dark2));border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:32px;position:relative;overflow:hidden;}
-.hadith-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.hadith-label{font-family:'Amiri',serif;color:var(--gold);font-size:1rem;letter-spacing:3px;text-align:center;margin-bottom:16px;}
-.hadith-arabic{font-family:'Amiri',serif;font-size:1.15rem;line-height:2;color:var(--text);text-align:right;direction:rtl;margin-bottom:10px;}
-.hadith-english{font-size:0.88rem;line-height:1.8;color:var(--text2);font-style:italic;margin-bottom:10px;}
-.hadith-source{font-size:0.75rem;color:var(--gold3);text-align:center;letter-spacing:1px;margin-top:4px;}
-.hadith-loading{text-align:center;color:var(--text2);font-style:italic;padding:16px 0;}
-/* chat layout */
-.chat-layout{display:flex;flex:1;overflow:hidden;}
-.chat-header{background:linear-gradient(180deg,rgba(8,5,1,0.99),rgba(18,13,4,0.97));border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.chat-room-name{font-family:'Amiri',serif;color:var(--gold);font-size:1.2rem;letter-spacing:2px;}
-.chat-room-meta{color:var(--text2);font-size:0.78rem;margin-top:2px;}
-.chat-header-actions{display:flex;gap:8px;align-items:center;}
-.messages-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px;}
-.messages-area::-webkit-scrollbar{width:4px;}
-.messages-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-/* members panel */
-.members-panel{width:220px;background:linear-gradient(180deg,rgba(8,5,1,0.99),rgba(13,10,4,0.97));border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:width 0.3s;}
-.members-panel.collapsed{width:0;overflow:hidden;}
-.members-panel-header{padding:14px 16px;border-bottom:1px solid var(--border);font-family:'Amiri',serif;color:var(--gold);font-size:0.95rem;letter-spacing:2px;flex-shrink:0;}
-.members-list{flex:1;overflow-y:auto;padding:8px;}
-.members-list::-webkit-scrollbar{width:3px;}
-.members-list::-webkit-scrollbar-thumb{background:var(--border);}
-.member-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;transition:background 0.2s;position:relative;}
-.member-item:hover{background:rgba(201,168,76,0.06);}
-.member-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--dark);flex-shrink:0;}
-.member-name{font-size:0.82rem;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.member-badge{font-size:0.6rem;color:var(--gold3);letter-spacing:1px;text-transform:uppercase;}
-.member-actions{display:none;gap:4px;}
-.member-item:hover .member-actions{display:flex;}
-.member-action-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--text2);padding:2px 6px;font-size:0.65rem;cursor:pointer;font-family:'Lora',serif;transition:all 0.2s;white-space:nowrap;}
-.member-action-btn:hover{border-color:var(--gold);color:var(--gold);}
-.member-action-btn.danger:hover{border-color:#e74c3c;color:#e74c3c;}
-.msg{display:flex;gap:10px;align-items:flex-end;max-width:72%;}
-.msg.own{align-self:flex-end;flex-direction:row-reverse;}
-.msg.system{align-self:center;max-width:100%;}
-.msg-avatar .avatar{width:34px;height:34px;font-size:0.75rem;}
-.msg-bubble{background:linear-gradient(160deg,var(--dark3),var(--dark4));border:1px solid var(--border);border-radius:48% 48% 8px 8px/18% 18% 8px 8px;padding:16px 14px 10px;max-width:100%;position:relative;cursor:pointer;transition:border-color 0.2s;}
-.msg-bubble:hover{border-color:var(--border2);}
-.msg.own .msg-bubble{background:linear-gradient(160deg,rgba(139,105,20,0.22),rgba(80,58,8,0.28));border-color:rgba(201,168,76,0.35);}
-.msg.system .msg-bubble{background:rgba(201,168,76,0.05);border-color:var(--border);border-radius:20px;padding:6px 20px;text-align:center;cursor:default;}
-.msg-bubble::after{content:'✦';position:absolute;top:4px;right:8px;font-size:0.45rem;color:var(--gold3);opacity:0.5;}
-.msg.system .msg-bubble::after{display:none;}
-.msg-author{font-family:'Amiri',serif;font-size:0.82rem;color:var(--gold);margin-bottom:4px;font-weight:700;}
-.msg-text{font-size:0.9rem;line-height:1.6;word-break:break-word;}
-.msg.system .msg-text{font-size:0.78rem;color:var(--text2);font-style:italic;font-family:'Amiri',serif;}
-.msg-time{font-size:0.65rem;color:var(--text2);margin-top:6px;text-align:right;}
-.msg-translation{margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.82rem;color:var(--text2);line-height:1.6;font-style:italic;display:none;}
-.msg-translation.show{display:block;}
-.translate-hint{font-size:0.65rem;color:var(--gold3);margin-top:4px;opacity:0.7;}
-.msg-img{max-width:260px;max-height:260px;border-radius:8px 8px 4px 4px;display:block;margin-top:8px;cursor:pointer;border:1px solid var(--border);}
-.chat-input-area{background:rgba(8,5,1,0.98);border-top:1px solid var(--border);padding:16px 20px;flex-shrink:0;}
-.chat-input-row{display:flex;gap:10px;align-items:flex-end;background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;}
-.chat-input-row:focus-within{border-color:var(--gold);}
-#msg-input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Lora',serif;font-size:0.9rem;resize:none;outline:none;max-height:120px;min-height:36px;line-height:1.5;padding-top:4px;}
-#msg-input::placeholder{color:var(--text2);font-style:italic;}
-.img-upload-btn{background:none;border:none;cursor:pointer;color:var(--gold3);font-size:1.3rem;padding:4px 6px;transition:color 0.2s;}
-.img-upload-btn:hover{color:var(--gold);}
-.send-btn{background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:50%;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--dark);font-size:1.1rem;transition:all 0.2s;flex-shrink:0;}
-.send-btn:hover{transform:scale(1.1);box-shadow:0 0 14px rgba(201,168,76,0.4);}
-.image-preview-wrap{display:none;padding:8px 0;position:relative;width:fit-content;}
-.image-preview-wrap.show{display:block;}
-.image-preview-thumb{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--border2);}
-.remove-preview{position:absolute;top:-6px;right:-6px;background:#c0392b;color:#fff;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:0.65rem;display:flex;align-items:center;justify-content:center;}
-.sound-btn,.members-toggle-btn{background:none;border:1px solid var(--border);border-radius:20px;color:var(--text2);padding:4px 10px;font-size:0.75rem;cursor:pointer;transition:all 0.2s;font-family:'Lora',serif;}
-.sound-btn:hover,.members-toggle-btn:hover{border-color:var(--gold);color:var(--gold);}
-.members-toggle-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.08);}
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.93);display:flex;align-items:center;justify-content:center;z-index:300;cursor:zoom-out;backdrop-filter:blur(10px);}
-.lightbox.hidden{display:none;}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;border:1px solid var(--border2);}
-@keyframes spin{to{transform:rotate(360deg);}}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(201,168,76,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:4px;}
-@media(max-width:700px){.members-panel{display:none;}.header-center{display:none;}#page-home{padding:16px 12px;}.msg{max-width:90%;}.messages-area{padding:12px;}.chat-input-area{padding:10px;}.hero-arch{padding:20px 24px;}.prayer-times-grid{grid-template-columns:repeat(3,1fr);}}
-</style>
-</head>
-<body>
-<script>
-for(let i=0;i<10;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*4+2;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${Math.random()*20+15}s;animation-delay:${Math.random()*15}s;`;document.body.appendChild(p);}
-</script>
-<div id="app">
-  <header>
-    <div class="logo" onclick="navigate('home')">مجلس<span class="logo-sub">The Arabian Gathering</span></div>
-    <div class="header-center">
-      <div class="hijri-date" id="hijri-date"></div>
-      <div class="lang-toggle">
-        <button id="btn-en" onclick="setLang('en')" class="active">EN</button>
-        <button id="btn-ar" onclick="setLang('ar')">عر</button>
-      </div>
-    </div>
-    <div class="header-right" id="header-right"></div>
-  </header>
+import { useState, useEffect } from "react";
+import {
+  Phone, Mail, MapPin, Menu, X, ChevronRight, Star,
+  ShieldCheck, UserCheck, BookOpen, Clock, Heart,
+  CheckCircle, MessageCircle, ArrowRight, Wifi, Camera
+} from "lucide-react";
 
-  <!-- HOME -->
-  <div id="page-home" class="page active">
-    <div class="home-hero">
-      <div class="hero-arch"><h1>مجلس<span id="hero-sub"></span></h1></div>
-      <div class="hero-actions" id="hero-actions"></div>
-    </div>
-    <!-- Prayer Widget -->
-    <div class="prayer-widget" id="prayer-widget">
-      <div class="prayer-widget-title" id="prayer-widget-title">🕌 Prayer Times</div>
-      <div id="prayer-times-content"><div class="prayer-loading"><span class="spin"></span></div></div>
-      <div class="prayer-location" id="prayer-location"></div>
-    </div>
-    <!-- Hadith -->
-    <div class="hadith-card">
-      <div class="hadith-label" id="hadith-label">✦ Hadith of the Day ✦</div>
-      <div id="hadith-body"><div class="hadith-loading"><span class="spin"></span></div></div>
-      <div class="hadith-source" id="hadith-source"></div>
-    </div>
-    <div class="join-private-bar">
-      <input type="text" id="private-code-input" maxlength="6" placeholder="Enter private room code...">
-      <button class="btn btn-outline btn-sm" onclick="joinByCode()" id="join-code-btn">Enter</button>
-    </div>
-    <div class="search-bar"><input type="text" id="search-input" oninput="filterRooms()"></div>
-    <div class="section-title"><span id="rooms-label"></span></div>
-    <div class="rooms-grid" id="rooms-grid"><div class="empty-state"><div class="icon">🕌</div><p>Loading...</p></div></div>
-  </div>
+const EMERALD = "#065f46";
+const PHONE = "+8801700000000";
+const EMAIL = "info@rahbarkendro.org";
+const ADDRESS = "Uttara, Dhaka, Bangladesh";
 
-  <!-- CHAT -->
-  <div id="page-chat" class="page">
-    <div class="chat-header">
-      <div>
-        <div class="chat-room-name" id="chat-room-name"></div>
-        <div class="chat-room-meta" id="chat-room-meta"></div>
-      </div>
-      <div class="chat-header-actions">
-        <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔔 ON</button>
-        <button class="members-toggle-btn active" id="members-toggle-btn" onclick="toggleMembersPanel()">👥 Members</button>
-        <button class="btn btn-outline btn-sm" id="leave-btn" onclick="leaveRoom()"></button>
-        <button class="btn btn-danger btn-sm" id="delete-room-btn" style="display:none" onclick="deleteRoom()"></button>
-      </div>
-    </div>
-    <div class="chat-layout">
-      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-        <div class="messages-area" id="messages-area"></div>
-        <div class="chat-input-area">
-          <div class="image-preview-wrap" id="img-preview-wrap">
-            <img id="img-preview-thumb" class="image-preview-thumb" src="" alt="">
-            <button class="remove-preview" onclick="clearImagePreview()">✕</button>
+// SVG Islamic Geometric Pattern
+const GeoBg = ({ opacity = 0.06 }) => (
+  <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="geo" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+        <polygon points="30,2 58,16 58,44 30,58 2,44 2,16" fill="none" stroke="#065f46" strokeWidth="0.8" opacity={opacity * 10} />
+        <polygon points="30,12 48,21 48,39 30,48 12,39 12,21" fill="none" stroke="#065f46" strokeWidth="0.4" opacity={opacity * 8} />
+        <circle cx="30" cy="30" r="3" fill="#065f46" opacity={opacity * 6} />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#geo)" />
+  </svg>
+);
+
+// Star rating helper
+const Stars = ({ n = 5 }) => Array.from({ length: n }).map((_, i) => (
+  <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />
+));
+
+// Nav links
+const NAV = ["সেবা", "মূল্য তালিকা", "সাফল্যের গল্প", "যোগাযোগ"];
+
+export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [formData, setFormData] = useState({ name: "", phone: "", message: "" });
+  const [submitted, setSubmitted] = useState(false);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setActiveTestimonial(p => (p + 1) % testimonials.length), 5000);
+    return () => clearInterval(t);
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 4000);
+    setFormData({ name: "", phone: "", message: "" });
+  };
+
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
+
+  return (
+    <div className="font-sans text-gray-800 overflow-x-hidden" style={{ fontFamily: "'Inter', 'Montserrat', sans-serif" }}>
+
+      {/* ── STICKY NAV ── */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-lg" : "bg-white/90 backdrop-blur"}`}>
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo("hero")}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow" style={{ background: EMERALD }}>
+              <Heart size={20} className="text-white fill-white" />
+            </div>
+            <div className="leading-tight">
+              <p className="font-bold text-sm" style={{ color: EMERALD }}>রাহবার</p>
+              <p className="text-xs text-slate-500 hidden sm:block">মাদকশক্তি নিরাময় কেন্দ্র</p>
+            </div>
           </div>
-          <div class="chat-input-row">
-            <button class="img-upload-btn" onclick="document.getElementById('img-file-input').click()">🖼</button>
-            <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
-            <textarea id="msg-input" rows="1" onkeydown="handleMsgKey(event)" oninput="autoResize(this)"></textarea>
-            <button class="send-btn" onclick="sendMessage()">➤</button>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-6">
+            {NAV.map((n, i) => (
+              <button key={i} onClick={() => scrollTo(["services","pricing","testimonials","contact"][i])}
+                className="text-sm font-medium text-gray-600 hover:text-emerald-700 transition-colors">
+                {n}
+              </button>
+            ))}
+          </nav>
+
+          {/* Emergency CTA */}
+          <div className="flex items-center gap-2">
+            <a href={`tel:${PHONE}`}
+              className="hidden sm:flex items-center gap-2 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow hover:opacity-90 transition-all"
+              style={{ background: EMERALD }}>
+              <Phone size={14} className="animate-pulse" /> জরুরি কল
+            </a>
+            <button className="md:hidden p-2 rounded-lg" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
         </div>
-      </div>
-      <!-- Members panel -->
-      <div class="members-panel" id="members-panel">
-        <div class="members-panel-header" id="members-panel-header">👥 Members</div>
-        <div class="members-list" id="members-list"></div>
-      </div>
-    </div>
-  </div>
 
-  <div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="">
-  </div>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="md:hidden bg-white border-t px-4 py-4 flex flex-col gap-3 shadow-lg">
+            {NAV.map((n, i) => (
+              <button key={i} onClick={() => scrollTo(["services","pricing","testimonials","contact"][i])}
+                className="text-left text-sm font-medium py-2 border-b border-gray-100 text-gray-700">{n}</button>
+            ))}
+            <a href={`tel:${PHONE}`} className="flex items-center justify-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl mt-1"
+              style={{ background: EMERALD }}>
+              <Phone size={14} /> জরুরি কল করুন
+            </a>
+          </div>
+        )}
+      </header>
 
-  <!-- REGISTER -->
-  <div class="modal-overlay hidden" id="modal-register">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="reg-title"></h2><div class="ornament">✦ ◆ ✦</div>
-      <div class="form-group"><label id="lbl-reg-name"></label><input type="text" id="reg-username"></div>
-      <div class="form-group"><label id="lbl-reg-email"></label><input type="email" id="reg-email"></div>
-      <div class="form-group"><label id="lbl-reg-pass"></label><input type="password" id="reg-password"></div>
-      <div class="error-msg" id="reg-error"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" id="reg-cancel" onclick="hideModal('register')"></button>
-        <button class="btn btn-gold" id="reg-btn" onclick="register()"></button>
-      </div>
-      <div class="divider" id="reg-divider"></div>
-      <button class="btn btn-outline" style="width:100%" id="reg-switch" onclick="hideModal('register');showModal('login')"></button>
-    </div>
-  </div>
+      {/* ── HERO ── */}
+      <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16"
+        style={{ background: "linear-gradient(135deg, #ecfdf5 0%, #f0f9ff 50%, #f8fafc 100%)" }}>
+        <GeoBg opacity={0.05} />
+        {/* Blurred decorative circles */}
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: EMERALD }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-10 blur-3xl bg-blue-400" />
 
-  <!-- LOGIN -->
-  <div class="modal-overlay hidden" id="modal-login">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="login-title"></h2><div class="ornament">✦ ◆ ✦</div>
-      <div class="form-group"><label id="lbl-login-email"></label><input type="email" id="login-email"></div>
-      <div class="form-group"><label id="lbl-login-pass"></label><input type="password" id="login-password"></div>
-      <div class="error-msg" id="login-error"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" id="login-cancel" onclick="hideModal('login')"></button>
-        <button class="btn btn-gold" id="login-btn" onclick="login()"></button>
-      </div>
-      <div class="divider" id="login-divider"></div>
-      <button class="btn btn-outline" style="width:100%" id="login-switch" onclick="hideModal('login');showModal('register')"></button>
-    </div>
-  </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-white border border-emerald-200 text-emerald-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm mb-6">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            ২৪/৭ চিকিৎসা সেবা উপলব্ধ
+          </div>
 
-  <!-- CREATE ROOM -->
-  <div class="modal-overlay hidden" id="modal-create-room">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="cr-title"></h2><div class="ornament">✦ ◆ ✦</div>
-      <div class="form-group">
-        <label id="lbl-cr-type"></label>
-        <div class="type-toggle">
-          <button id="type-btn-public" class="active" onclick="setRoomType('public')">🔓 Public</button>
-          <button id="type-btn-private" onclick="setRoomType('private')">🔐 Private</button>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-4" style={{ color: EMERALD }}>
+            রাহবার মাদকশক্তি
+            <br /><span className="text-slate-700">নিরাময় কেন্দ্র</span>
+          </h1>
+
+          {/* Motto */}
+          <div className="relative inline-block my-6">
+            <div className="absolute inset-0 blur-sm opacity-30 rounded-2xl" style={{ background: EMERALD }} />
+            <p className="relative text-xl sm:text-2xl font-bold text-white px-6 py-3 rounded-2xl"
+              style={{ background: EMERALD }}>
+              আঁধার নয়, জীবন হোক আলোকময়
+            </p>
+          </div>
+
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+            বিশেষজ্ঞ চিকিৎসক, ইসলামিক কাউন্সেলিং এবং আধুনিক থেরাপির মাধ্যমে মাদকমুক্ত সুন্দর জীবনের পথে আপনাকে সহযোগিতা করি।
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href={`tel:${PHONE}`}
+              className="flex items-center justify-center gap-2 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-base"
+              style={{ background: EMERALD }}>
+              <Phone size={18} /> এখনই ফোন করুন
+            </a>
+            <button onClick={() => scrollTo("services")}
+              className="flex items-center justify-center gap-2 text-emerald-700 font-bold px-8 py-4 rounded-xl border-2 border-emerald-600 hover:bg-emerald-50 transition-all text-base">
+              আমাদের সেবা দেখুন <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap justify-center gap-6 mt-12 text-sm text-gray-500">
+            {[["✅","লাইসেন্সপ্রাপ্ত কেন্দ্র"],["🕌","ইসলামিক পদ্ধতি"],["👨‍⚕️","বিশেষজ্ঞ টিম"],["🔒","সম্পূর্ণ গোপনীয়"]].map(([e,t],i)=>(
+              <span key={i} className="flex items-center gap-1">{e} {t}</span>
+            ))}
+          </div>
         </div>
-        <div class="type-hint" id="type-hint"></div>
-      </div>
-      <div class="form-group"><label id="lbl-cr-name"></label><input type="text" id="room-name-input"></div>
-      <div class="form-group"><label id="lbl-cr-desc"></label><input type="text" id="room-desc-input"></div>
-      <div class="form-group" id="cr-pass-group"><label id="lbl-cr-pass"></label><input type="password" id="room-pass-input"></div>
-      <div class="error-msg" id="room-error"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" id="cr-cancel" onclick="hideModal('create-room')"></button>
-        <button class="btn btn-gold" id="cr-btn" onclick="createRoom()"></button>
-      </div>
-    </div>
-  </div>
+      </section>
 
-  <!-- ROOM CREATED -->
-  <div class="modal-overlay hidden" id="modal-room-created">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="rc-title">Room Created</h2><div class="ornament">✦ ◆ ✦</div>
-      <p id="rc-msg" style="color:var(--text2);text-align:center;margin-bottom:4px;font-size:0.9rem;"></p>
-      <div class="room-code-box">
-        <p id="rc-code-label"></p>
-        <div class="room-code" id="rc-code"></div>
-        <div class="room-code-warn" id="rc-warn"></div>
-      </div>
-      <div class="form-actions" style="margin-top:20px;">
-        <button class="btn btn-gold" onclick="dismissCreated()">Enter Room</button>
-      </div>
-    </div>
-  </div>
+      {/* ── SERVICES ── */}
+      <section id="services" className="relative py-20 bg-white overflow-hidden">
+        <GeoBg opacity={0.03} />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">আমাদের সেবা</span>
+            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">সামগ্রিক নিরাময় পদ্ধতি</h2>
+            <p className="text-gray-500 mt-3 max-w-xl mx-auto">আমরা বিশ্বাস করি, শরীর, মন ও আত্মার সম্মিলিত চিকিৎসাই পূর্ণ আরোগ্যের পথ।</p>
+          </div>
 
-  <!-- JOIN ROOM -->
-  <div class="modal-overlay hidden" id="modal-join-room">
-    <div class="modal">
-      <svg class="modal-geo" viewBox="0 0 40 40" fill="none"><polygon points="20,2 24,13 36,13 27,20 30,32 20,25 10,32 13,20 4,13 16,13" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
-      <h2 id="join-title"></h2><div class="ornament">✦ ◆ ✦</div>
-      <p id="join-desc" style="color:var(--text2);text-align:center;margin-bottom:20px;font-family:'Amiri',serif;font-size:1rem;"></p>
-      <div class="form-group"><label id="lbl-join-pass"></label><input type="password" id="join-pass-input"></div>
-      <div class="error-msg" id="join-error"></div>
-      <div class="form-actions">
-        <button class="btn btn-outline" id="join-cancel" onclick="hideModal('join-room')"></button>
-        <button class="btn btn-gold" id="join-enter" onclick="joinRoomWithPassword()"></button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import{getFirestore,collection,doc,addDoc,setDoc,getDoc,getDocs,deleteDoc,onSnapshot,query,orderBy,where,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig={apiKey:"AIzaSyBEyS6QjmOpS-DOKDdO1h-3qEKca79_HoA",authDomain:"majlis-61b79.firebaseapp.com",projectId:"majlis-61b79",storageBucket:"majlis-61b79.firebasestorage.app",messagingSenderId:"633132324226",appId:"1:633132324226:web:160eb3dfe90e03d052eb9b"};
-const fbApp=initializeApp(firebaseConfig);
-const auth=getAuth(fbApp);
-const db=getFirestore(fbApp);
-
-let currentUser=null,allRooms=[],currentRoomId=null,currentRoomData=null,pendingRoomId=null,imageData=null,msgUnsub=null,roomsUnsub=null,membersUnsub=null,uiLang='en',soundEnabled=true,lastMsgCount=0,newRoomType='public',createdRoomId=null,membersPanelOpen=true;
-const transCache={};
-let prayerTimes=null,prayerCheckInterval=null,lastPopupSalah=null;
-
-// ── Window globals ──
-window.toggleSound=function(){soundEnabled=!soundEnabled;const b=document.getElementById('sound-btn');if(b)b.textContent=`🔔 ${soundEnabled?'ON':'OFF'}`;};
-window.navigate=navigate;window.setLang=setLang;
-window.showModal=id=>document.getElementById('modal-'+id).classList.remove('hidden');
-window.hideModal=id=>{document.getElementById('modal-'+id).classList.add('hidden');clearErrors();};
-window.filterRooms=renderRooms;window.leaveRoom=leaveRoom;window.deleteRoom=deleteRoom;
-window.sendMessage=sendMessage;window.handleMsgKey=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}};
-window.autoResize=el=>{el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';};
-window.handleImageSelect=handleImageSelect;window.clearImagePreview=clearImagePreview;
-window.openLightbox=src=>{document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.remove('hidden');};
-window.closeLightbox=()=>document.getElementById('lightbox').classList.add('hidden');
-window.translateMsg=translateMsg;window.tryEnterRoom=tryEnterRoom;
-window.joinRoomWithPassword=joinRoomWithPassword;window.createRoom=createRoom;
-window.register=register;window.login=login;
-window.logout=async()=>{leaveRoom();await signOut(auth);};
-window.setRoomType=setRoomType;window.joinByCode=joinByCode;window.dismissCreated=dismissCreated;
-window.toggleMembersPanel=toggleMembersPanel;
-window.kickMember=kickMember;window.muteMember=muteMember;
-
-// ── Sound ──
-let audioCtx=null;
-function getAudioCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
-function playNotification(){
-  if(!soundEnabled)return;
-  try{const ctx=getAudioCtx();[220,440,660].forEach((freq,i)=>{const osc=ctx.createOscillator(),g=ctx.createGain();osc.type='sine';osc.frequency.setValueAtTime(freq,ctx.currentTime);g.gain.setValueAtTime(i===0?0.18:0.08,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.2);osc.connect(g);g.connect(ctx.destination);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+1.2);});}catch(e){}
-}
-
-// ── Prayer Times ──
-const PRAYER_NAMES_EN=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
-const PRAYER_NAMES_AR=['الفجر','الشروق','الظهر','العصر','المغرب','العشاء'];
-const PRAYER_KEYS=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
-
-async function loadPrayerTimes(){
-  const titleEl=document.getElementById('prayer-widget-title');
-  const contentEl=document.getElementById('prayer-times-content');
-  const locEl=document.getElementById('prayer-location');
-  if(titleEl)titleEl.textContent=uiLang==='ar'?'🕌 مواقيت الصلاة':'🕌 Prayer Times';
-  if(contentEl)contentEl.innerHTML=`<div class="prayer-loading"><span class="spin"></span></div>`;
-  try{
-    // get location
-    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:8000}));
-    const{latitude:lat,longitude:lng}=pos.coords;
-    const today=new Date();
-    const dd=String(today.getDate()).padStart(2,'0'),mm=String(today.getMonth()+1).padStart(2,'0'),yyyy=today.getFullYear();
-    const res=await fetch(`https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lng}&method=2`);
-    const data=await res.json();
-    const timings=data?.data?.timings;
-    const meta=data?.data?.meta;
-    if(!timings)throw new Error('no timings');
-    prayerTimes=timings;
-    const now=new Date();
-    const nowMins=now.getHours()*60+now.getMinutes();
-    // find next prayer
-    let nextIdx=-1;
-    const prayerMins=PRAYER_KEYS.map(k=>{const[h,m]=timings[k].split(':').map(Number);return h*60+m;});
-    for(let i=0;i<prayerMins.length;i++){if(prayerMins[i]>nowMins){nextIdx=i;break;}}
-    if(nextIdx===-1)nextIdx=0;
-    // render grid
-    const names=uiLang==='ar'?PRAYER_NAMES_AR:PRAYER_NAMES_EN;
-    contentEl.innerHTML=`<div class="prayer-times-grid">${PRAYER_KEYS.map((k,i)=>`<div class="prayer-time-item${i===nextIdx?' next':''}"><span class="prayer-name">${names[i]}</span><span class="prayer-time">${timings[k]}</span></div>`).join('')}</div>`;
-    if(meta&&locEl)locEl.textContent=`📍 ${meta.timezone||''}`;
-    // start checker
-    startPrayerChecker(prayerMins,nextIdx,names);
-  }catch(e){
-    if(contentEl)contentEl.innerHTML=`<div class="prayer-loading" style="color:var(--text2);font-size:0.8rem;">${uiLang==='ar'?'يرجى السماح بالوصول إلى موقعك لعرض مواقيت الصلاة':'Allow location access to show prayer times.'}</div>`;
-  }
-}
-
-function startPrayerChecker(prayerMins,nextIdx,names){
-  if(prayerCheckInterval)clearInterval(prayerCheckInterval);
-  prayerCheckInterval=setInterval(()=>{
-    const now=new Date();
-    const nowMins=now.getHours()*60+now.getMinutes();
-    const diff=prayerMins[nextIdx]-nowMins;
-    if(diff===15||diff===10||diff===5){
-      const salahName=names[nextIdx];
-      if(lastPopupSalah!==`${salahName}-${diff}`){{
-        lastPopupSalah=`${salahName}-${diff}`;
-        showSalahPopup(salahName,diff);
-      }}
-    }
-  },60000);
-}
-
-function showSalahPopup(name,minsLeft){
-  // remove existing
-  document.querySelectorAll('.salah-popup').forEach(el=>el.remove());
-  const popup=document.createElement('div');
-  popup.className='salah-popup';
-  popup.innerHTML=`<span class="salah-popup-icon">🕌</span><div class="salah-popup-title">${name} ${uiLang==='ar'?'قادم':'is coming'}</div><div class="salah-popup-text">${uiLang==='ar'?`${name} بعد ${minsLeft} دقائق — حان وقت الاستعداد`:`${name} in ${minsLeft} minutes — time to prepare`}</div>`;
-  document.body.appendChild(popup);
-  setTimeout(()=>{popup.classList.add('fade-out');setTimeout(()=>popup.remove(),500);},5000);
-}
-
-// ── Members Panel ──
-function toggleMembersPanel(){
-  membersPanelOpen=!membersPanelOpen;
-  const panel=document.getElementById('members-panel');
-  const btn=document.getElementById('members-toggle-btn');
-  panel.classList.toggle('collapsed',!membersPanelOpen);
-  btn.classList.toggle('active',membersPanelOpen);
-}
-
-function listenMembers(roomId){
-  if(membersUnsub){membersUnsub();membersUnsub=null;}
-  membersUnsub=onSnapshot(collection(db,'rooms',roomId,'members'),snap=>{
-    const list=document.getElementById('members-list');
-    if(!list)return;
-    const isOwner=currentRoomData&&currentUser&&currentRoomData.ownerId===currentUser.uid;
-    const members=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const header=document.getElementById('members-panel-header');
-    if(header)header.textContent=`👥 ${uiLang==='ar'?'الأعضاء':'Members'} (${members.length})`;
-    if(!members.length){list.innerHTML=`<div style="padding:16px;color:var(--text2);font-size:0.8rem;text-align:center;font-style:italic;">${uiLang==='ar'?'لا يوجد أعضاء بعد':'No members yet'}</div>`;return;}
-    list.innerHTML=members.map(m=>{
-      const isMe=m.uid===currentUser?.uid;
-      const isRoomOwner=currentRoomData&&m.uid===currentRoomData.ownerId;
-      const ini=(m.name||'?').substring(0,2).toUpperCase();
-      const canManage=isOwner&&!isMe&&!isRoomOwner;
-      return`<div class="member-item">
-        <div class="member-avatar">${ini}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="member-name">${escHtml(m.name||'Unknown')}</div>
-          ${isRoomOwner?`<div class="member-badge">${uiLang==='ar'?'صاحب المجلس':'Owner'}</div>`:''}
-          ${isMe&&!isRoomOwner?`<div class="member-badge">${uiLang==='ar'?'أنت':'You'}</div>`:''}
-          ${m.muted?`<div class="member-badge" style="color:#e74c3c;">${uiLang==='ar'?'مكتوم':'Muted'}</div>`:''}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((s, i) => (
+              <div key={i} className="group relative rounded-2xl border border-gray-100 bg-white p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 rounded-bl-full opacity-10 transition-all group-hover:opacity-20"
+                  style={{ background: s.color || EMERALD }} />
+                <div className="w-13 h-13 w-12 h-12 rounded-xl flex items-center justify-center mb-5 shadow"
+                  style={{ background: s.color || EMERALD }}>
+                  <s.icon size={22} className="text-white" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-800 mb-2">{s.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-4">{s.desc}</p>
+                <div className="flex flex-wrap gap-2">
+                  {s.tags.map((t, j) => (
+                    <span key={j} className="text-xs font-medium px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">{t}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        ${canManage?`<div class="member-actions">
-          <button class="member-action-btn" onclick="muteMember('${roomId}','${m.id}',${!m.muted})">${m.muted?(uiLang==='ar'?'رفع الكتم':'Unmute'):(uiLang==='ar'?'كتم':'Mute')}</button>
-          <button class="member-action-btn danger" onclick="kickMember('${roomId}','${m.id}','${escAttr(m.name||'')}')">${uiLang==='ar'?'طرد':'Kick'}</button>
-        </div>`:''}
-      </div>`;
-    }).join('');
-  });
+      </section>
+
+      {/* ── PRICING ── */}
+      <section id="pricing" className="relative py-20 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%)" }}>
+        <GeoBg opacity={0.04} />
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">মূল্য তালিকা</span>
+            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">চিকিৎসা প্যাকেজ</h2>
+            <p className="text-gray-500 mt-3">সকল প্যাকেজে বিশেষজ্ঞ চিকিৎসা, ইসলামিক কাউন্সেলিং ও নিয়মিত মনিটরিং অন্তর্ভুক্ত।</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Non-AC */}
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 shadow-sm hover:shadow-lg transition-all">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-widest text-gray-400">স্ট্যান্ডার্ড</span>
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-1">নন-এসি কেবিন</h3>
+              <div className="flex items-end gap-1 my-4">
+                <span className="text-4xl font-black" style={{ color: EMERALD }}>৳৫০,০০০</span>
+                <span className="text-gray-400 mb-1 text-sm">/ মাস</span>
+              </div>
+              <p className="text-xs text-amber-600 font-medium bg-amber-50 rounded-lg px-3 py-2 mb-6">
+                ⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য
+              </p>
+              <ul className="space-y-3 mb-8">
+                {planFeatures.map((f, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-gray-600">
+                    <CheckCircle size={16} className="mt-0.5 shrink-0" style={{ color: EMERALD }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a href={`tel:${PHONE}`}
+                className="block text-center font-bold py-3 rounded-xl border-2 text-emerald-700 border-emerald-600 hover:bg-emerald-50 transition-all">
+                ভর্তির জন্য যোগাযোগ করুন
+              </a>
+            </div>
+
+            {/* AC – highlighted */}
+            <div className="rounded-2xl p-8 shadow-xl relative overflow-hidden hover:shadow-2xl transition-all"
+              style={{ background: EMERALD }}>
+              <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-black px-3 py-1 rounded-full">
+                জনপ্রিয়
+              </div>
+              <GeoBg opacity={0.04} />
+              <div className="relative z-10">
+                <span className="text-xs font-bold uppercase tracking-widest text-emerald-200">প্রিমিয়াম</span>
+                <h3 className="text-2xl font-black text-white mt-1 mb-1">এসি কেবিন</h3>
+                <div className="flex items-end gap-1 my-4">
+                  <span className="text-4xl font-black text-white">৳৬০,০০০</span>
+                  <span className="text-emerald-200 mb-1 text-sm">/ মাস</span>
+                </div>
+                <p className="text-xs text-yellow-300 font-medium bg-emerald-800/50 rounded-lg px-3 py-2 mb-6">
+                  ⚠️ ওষুধের খরচ আলাদাভাবে প্রযোজ্য
+                </p>
+                <ul className="space-y-3 mb-8">
+                  {[...planFeatures, "এয়ার কন্ডিশনড কেবিন", "উন্নত গোপনীয়তা সুবিধা"].map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-emerald-100">
+                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-yellow-300" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <a href={`tel:${PHONE}`}
+                  className="block text-center font-bold py-3 rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all">
+                  ভর্তির জন্য যোগাযোগ করুন
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-gray-400 text-xs mt-6">
+            * বিস্তারিত জানতে সরাসরি যোগাযোগ করুন। মূল্য পরিবর্তনযোগ্য।
+          </p>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section id="testimonials" className="relative py-20 bg-white overflow-hidden">
+        <GeoBg opacity={0.03} />
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">সাফল্যের গল্প</span>
+            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">যারা ফিরে পেয়েছেন আলো</h2>
+            <p className="text-gray-500 mt-3">তাঁদের সাহসী যাত্রা, আমাদের অনুপ্রেরণা।</p>
+          </div>
+
+          {/* Featured */}
+          <div className="rounded-2xl p-8 sm:p-10 mb-8 relative overflow-hidden text-white"
+            style={{ background: EMERALD }}>
+            <GeoBg opacity={0.05} />
+            <div className="relative z-10">
+              <div className="flex gap-1 mb-4"><Stars /></div>
+              <p className="text-lg sm:text-xl font-medium leading-relaxed mb-6 text-emerald-50">
+                "{testimonials[activeTestimonial].quote}"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-600 flex items-center justify-center text-xl font-black">
+                  {testimonials[activeTestimonial].name[0]}
+                </div>
+                <div>
+                  <p className="font-bold">{testimonials[activeTestimonial].name}</p>
+                  <p className="text-emerald-300 text-sm">{testimonials[activeTestimonial].location} · {testimonials[activeTestimonial].date}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-6">
+                {testimonials.map((_, i) => (
+                  <button key={i} onClick={() => setActiveTestimonial(i)}
+                    className={`h-2 rounded-full transition-all ${i === activeTestimonial ? "w-8 bg-white" : "w-2 bg-emerald-400"}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {testimonials.map((t, i) => (
+              <div key={i} onClick={() => setActiveTestimonial(i)}
+                className={`rounded-xl p-5 border-2 cursor-pointer transition-all ${i === activeTestimonial ? "border-emerald-500 bg-emerald-50" : "border-gray-100 bg-white hover:border-emerald-200"}`}>
+                <div className="flex gap-1 mb-2"><Stars n={5} /></div>
+                <p className="text-xs text-gray-500 line-clamp-3 mb-3">"{t.quote}"</p>
+                <p className="text-xs font-bold text-slate-700">{t.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CONTACT ── */}
+      <section id="contact" className="relative py-20 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%)" }}>
+        <GeoBg opacity={0.04} />
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-600">যোগাযোগ</span>
+            <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-800">আজই প্রথম পদক্ষেপ নিন</h2>
+            <p className="text-gray-500 mt-3">সাহায্যের জন্য পৌঁছানোই সাহসিকতার প্রথম চিহ্ন।</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* Info */}
+            <div className="space-y-6">
+              {/* Contact cards */}
+              {[
+                { icon: Phone, label: "ফোন / হেল্পলাইন", val: PHONE, href: `tel:${PHONE}` },
+                { icon: Mail, label: "ইমেইল", val: EMAIL, href: `mailto:${EMAIL}` },
+                { icon: MapPin, label: "ঠিকানা", val: ADDRESS, href: "#" },
+              ].map((c, i) => (
+                <a key={i} href={c.href}
+                  className="flex items-center gap-4 bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: EMERALD }}>
+                    <c.icon size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-medium">{c.label}</p>
+                    <p className="font-semibold text-slate-700 group-hover:text-emerald-700 transition-colors">{c.val}</p>
+                  </div>
+                  <ArrowRight size={16} className="ml-auto text-gray-300 group-hover:text-emerald-500 transition-colors" />
+                </a>
+              ))}
+
+              {/* Map embed */}
+              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-56">
+                <iframe
+                  title="Rahbar Kendro Location"
+                  width="100%" height="100%"
+                  src="https://maps.google.com/maps?q=23.8746,90.3928&z=15&output=embed"
+                  style={{ border: 0 }} allowFullScreen loading="lazy"
+                />
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+              <h3 className="font-bold text-xl text-slate-800 mb-6">বার্তা পাঠান</h3>
+              {submitted ? (
+                <div className="flex flex-col items-center justify-center h-48 text-center">
+                  <CheckCircle size={48} className="mb-3" style={{ color: EMERALD }} />
+                  <p className="font-bold text-slate-700 text-lg">বার্তা পাঠানো হয়েছে!</p>
+                  <p className="text-gray-500 text-sm mt-1">আমরা শীঘ্রই যোগাযোগ করব।</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {[
+                    { id: "name", label: "আপনার নাম", type: "text", placeholder: "মোহাম্মদ রহিম" },
+                    { id: "phone", label: "ফোন নম্বর", type: "tel", placeholder: "+8801XXXXXXXXX" },
+                  ].map(f => (
+                    <div key={f.id}>
+                      <label className="text-sm font-semibold text-gray-600 mb-1 block">{f.label}</label>
+                      <input type={f.type} placeholder={f.placeholder}
+                        value={formData[f.id]}
+                        onChange={e => setFormData(p => ({ ...p, [f.id]: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition" />
+                    </div>
+                  ))}
+                  <div>
+                    <label className="text-sm font-semibold text-gray-600 mb-1 block">বার্তা</label>
+                    <textarea rows={4} placeholder="আপনার সমস্যা বা প্রশ্ন লিখুন..."
+                      value={formData.message}
+                      onChange={e => setFormData(p => ({ ...p, message: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 transition resize-none" />
+                  </div>
+                  <button onClick={handleSubmit}
+                    className="w-full text-white font-bold py-3.5 rounded-xl hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-md"
+                    style={{ background: EMERALD }}>
+                    বার্তা পাঠান →
+                  </button>
+                  <p className="text-center text-xs text-gray-400">🔒 আপনার তথ্য সম্পূর্ণ গোপন রাখা হবে</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="text-white py-10" style={{ background: EMERALD }}>
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Heart size={20} className="fill-white" />
+            <span className="font-black text-lg">রাহবার মাদকশক্তি নিরাময় কেন্দ্র</span>
+          </div>
+          <p className="text-emerald-200 text-sm mb-1">আঁধার নয়, জীবন হোক আলোকময়</p>
+          <p className="text-emerald-300 text-xs">{ADDRESS}</p>
+          <div className="border-t border-emerald-700 mt-6 pt-4 text-xs text-emerald-400">
+            © 2025 Rahbar Madokshakti Niramoy Kendro · সর্বস্বত্ব সংরক্ষিত
+          </div>
+        </div>
+      </footer>
+
+      {/* ── FLOATING WHATSAPP / CALL ── */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <a href="https://wa.me/8801700000000" target="_blank" rel="noreferrer"
+          className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all bg-green-500 text-white"
+          title="WhatsApp">
+          <MessageCircle size={26} className="fill-white" />
+        </a>
+        <a href={`tel:${PHONE}`}
+          className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all text-white animate-bounce"
+          style={{ background: EMERALD }}
+          title="জরুরি কল">
+          <Phone size={24} />
+        </a>
+      </div>
+
+    </div>
+  );
 }
 
-async function kickMember(roomId,memberId,name){
-  if(!currentRoomData||currentUser.uid!==currentRoomData.ownerId)return;
-  if(!confirm(`${uiLang==='ar'?'طرد':'Kick'} ${name}?`))return;
-  await deleteDoc(doc(db,'rooms',roomId,'members',memberId));
-  // post system message
-  await addDoc(collection(db,'rooms',roomId,'messages'),{type:'system',text:uiLang==='ar'?`تم طرد ${name} من المجلس`:`${name} was removed from the gathering`,ts:serverTimestamp()});
-}
-
-async function muteMember(roomId,memberId,mute){
-  if(!currentRoomData||currentUser.uid!==currentRoomData.ownerId)return;
-  await setDoc(doc(db,'rooms',roomId,'members',memberId),{muted:mute},{merge:true});
-}
-
-async function joinMemberList(roomId){
-  if(!currentUser)return;
-  const ref=doc(db,'rooms',roomId,'members',currentUser.uid);
-  await setDoc(ref,{uid:currentUser.uid,name:currentUser.displayName||currentUser.email,joinedAt:serverTimestamp(),muted:false},{merge:true});
-}
-
-async function leaveMemberList(roomId){
-  if(!currentUser||!roomId)return;
-  try{await deleteDoc(doc(db,'rooms',roomId,'members',currentUser.uid));}catch(e){}
-}
-
-// ── Room type ──
-function setRoomType(type){
-  newRoomType=type;
-  document.getElementById('type-btn-public').classList.toggle('active',type==='public');
-  document.getElementById('type-btn-private').classList.toggle('active',type==='private');
-  const hint=document.getElementById('type-hint');
-  const passGroup=document.getElementById('cr-pass-group');
-  if(type==='private'){hint.textContent=uiLang==='ar'?'مجلس مخفي — يُدخل بكود سري فقط':'Hidden room — only accessible via a secret code.';passGroup.style.display='none';}
-  else{hint.textContent=uiLang==='ar'?'مجلس مرئي للجميع — يمكن تأمينه بكلمة مرور':'Visible to everyone — optionally password protected.';passGroup.style.display='block';}
-}
-
-function genCode(){return Math.random().toString(36).substring(2,8).toUpperCase();}
-
-// ── Hadith ──
-const COLLECTIONS=[{key:'bukhari',label:'Sahih Bukhari',size:7563},{key:'muslim',label:'Sahih Muslim',size:3032},{key:'abudawud',label:'Sunan Abu Dawud',size:5274},{key:'ibnmajah',label:'Sunan Ibn Majah',size:4341},{key:'tirmidhi',label:"Jami' at-Tirmidhi",size:3956}];
-// Expanded offline-first hadith pool — shown instantly, no network needed
-const HADITH_POOL=[
-  {ar:'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى',en:'Actions are judged by intentions, and every person will get what they intended.',src:'Sahih Bukhari, No. 1'},
-  {ar:'خَيْرُكُمْ خَيْرُكُمْ لِأَهْلِهِ وَأَنَا خَيْرُكُمْ لِأَهْلِي',en:'The best of you are those who are best to their families, and I am the best of you to my family.',src:'Sahih Bukhari, No. 5090'},
-  {ar:'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',en:'A Muslim is one from whose tongue and hand other Muslims are safe.',src:'Sahih Bukhari, No. 10'},
-  {ar:'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',en:'None of you truly believes until he loves for his brother what he loves for himself.',src:'Sahih Bukhari, No. 13'},
-  {ar:'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ',en:'Whoever believes in Allah and the Last Day should speak good or remain silent.',src:'Sahih Bukhari, No. 6018'},
-  {ar:'الدِّينُ النَّصِيحَةُ',en:'The religion is sincere advice.',src:'Sahih Muslim, No. 55'},
-  {ar:'أَكْمَلُ الْمُؤْمِنِينَ إِيمَانًا أَحْسَنُهُمْ خُلُقًا',en:'The most complete of the believers in faith are those with the best character.',src:'Sunan Abu Dawud, No. 4682'},
-  {ar:'اتَّقِ اللَّهِ حَيْثُمَا كُنْتَ وَأَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ تَمْحُهَا',en:'Fear Allah wherever you are, and follow a bad deed with a good one and it will erase it.',src:"Jami' at-Tirmidhi, No. 1987"},
-  {ar:'الطَّهُورُ شَطْرُ الْإِيمَانِ',en:'Cleanliness is half of faith.',src:'Sahih Muslim, No. 223'},
-  {ar:'خَيْرُ الناسِ أَنْفَعُهُمْ لِلنَّاسِ',en:'The best of people are those most beneficial to people.',src:'Al-Mu\'jam Al-Awsat, No. 5937'},
-  {ar:'ابْتَسَامَتُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ',en:'Your smile in the face of your brother is a charity.',src:"Jami' at-Tirmidhi, No. 1956"},
-  {ar:'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ',en:'Whoever takes a path seeking knowledge, Allah will make easy for him a path to Paradise.',src:'Sahih Muslim, No. 2699'},
-  {ar:'الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا',en:'The believer to another believer is like a building, each part strengthening the other.',src:'Sahih Bukhari, No. 481'},
-  {ar:'إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ فِي الْأَمْرِ كُلِّهِ',en:'Allah is gentle and loves gentleness in all matters.',src:'Sahih Bukhari, No. 6927'},
-  {ar:'مَنْ لَا يَرْحَمُ النَّاسَ لَا يَرْحَمُهُ اللَّهُ',en:'Whoever does not show mercy to people, Allah will not show mercy to him.',src:'Sahih Bukhari, No. 7376'},
+// ── DATA ──
+const services = [
+  {
+    icon: Camera,
+    title: "২৪/৭ সিসিটিভি নজরদারি",
+    desc: "রোগীর সুরক্ষা ও নিরাপত্তায় সার্বক্ষণিক ক্যামেরা পর্যবেক্ষণ ব্যবস্থা বজায় রাখা হয়।",
+    color: "#0f766e",
+    tags: ["নিরাপত্তা", "সার্বক্ষণিক"],
+  },
+  {
+    icon: UserCheck,
+    title: "বিশেষজ্ঞ চিকিৎসক দল",
+    desc: "মনোরোগ বিশেষজ্ঞ, ক্লিনিক্যাল সাইকোলজিস্ট এবং অ্যাডিকশন কাউন্সেলর দ্বারা সমন্বিত চিকিৎসা।",
+    color: "#065f46",
+    tags: ["মনোরোগ", "কাউন্সেলিং", "ডিটক্স"],
+  },
+  {
+    icon: BookOpen,
+    title: "কুরআন ও নামাজ প্রশিক্ষণ",
+    desc: "আত্মিক পুনর্জাগরণের জন্য নিয়মিত কুরআন তিলাওয়াত, নামাজ ও ইসলামিক থেরাপি সেশন।",
+    color: "#1e40af",
+    tags: ["ইসলামিক", "কুরআন", "নামাজ"],
+  },
+  {
+    icon: Clock,
+    title: "নিয়মিত ফলো-আপ",
+    desc: "চিকিৎসা শেষেও রোগীর সুস্থতা নিশ্চিত করতে মাসিক ফলো-আপ ও পুনর্বাসন সহায়তা প্রদান।",
+    color: "#7c3aed",
+    tags: ["পুনর্বাসন", "ফলো-আপ"],
+  },
+  {
+    icon: ShieldCheck,
+    title: "সম্পূর্ণ গোপনীয়তা",
+    desc: "রোগীর পরিচয় ও তথ্য সম্পূর্ণ গোপন রাখা হয়। পরিবারের সম্মান আমাদের অগ্রাধিকার।",
+    color: "#b45309",
+    tags: ["গোপনীয়", "বিশ্বাসযোগ্য"],
+  },
+  {
+    icon: Heart,
+    title: "পারিবারিক কাউন্সেলিং",
+    desc: "পরিবারকে সম্পৃক্ত করে আবেগিক সহায়তা ও পুনর্মিলন থেরাপির মাধ্যমে সম্পর্ক পুনর্নির্মাণ।",
+    color: "#be185d",
+    tags: ["পরিবার", "থেরাপি"],
+  },
 ];
 
-async function loadHadith(){
-  const isAr=uiLang==='ar';
-  document.getElementById('hadith-label').textContent=isAr?'✦ حديث اليوم ✦':'✦ Hadith of the Day ✦';
-  // Show a random hadith from the pool immediately — no spinner, no network needed
-  const f=HADITH_POOL[Math.floor(Math.random()*HADITH_POOL.length)];
-  document.getElementById('hadith-body').innerHTML=isAr
-    ?`<div class="hadith-arabic">${f.ar}</div><div class="hadith-english">${f.en}</div>`
-    :`<div class="hadith-english">${f.en}</div><div class="hadith-arabic">${f.ar}</div>`;
-  document.getElementById('hadith-source').textContent=`— ${f.src}`;
-  // Then try to fetch a fresh one in the background and swap if successful
-  try{
-    const col=COLLECTIONS[Math.floor(Math.random()*COLLECTIONS.length)];
-    const num=Math.floor(Math.random()*col.size)+1;
-    const ctrl=new AbortController();
-    setTimeout(()=>ctrl.abort(),6000);
-    const[enRes,arRes]=await Promise.all([
-      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-${col.key}/${num}.json`,{signal:ctrl.signal}),
-      fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-${col.key}/${num}.json`,{signal:ctrl.signal})
-    ]);
-    const[enData,arData]=await Promise.all([enRes.json(),arRes.json()]);
-    const english=enData?.hadiths?.[0]?.text||enData?.hadith?.[0]?.body||'';
-    const arabic=arData?.hadiths?.[0]?.text||arData?.hadith?.[0]?.body||'';
-    if(english||arabic){
-      document.getElementById('hadith-body').innerHTML=isAr
-        ?`${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}${english?`<div class="hadith-english">${english}</div>`:''}`
-        :`${english?`<div class="hadith-english">${english}</div>`:''}${arabic?`<div class="hadith-arabic">${arabic}</div>`:''}`;
-      document.getElementById('hadith-source').textContent=`— ${col.label}, No. ${num}`;
-    }
-  }catch(e){/* keep the pool hadith already shown */}
-}
+const planFeatures = [
+  "বিশেষজ্ঞ চিকিৎসক পরিদর্শন",
+  "ইসলামিক কাউন্সেলিং সেশন",
+  "ডিটক্সিফিকেশন প্রোগ্রাম",
+  "তিনবেলা পুষ্টিকর খাবার",
+  "২৪/৭ নার্সিং সেবা",
+  "কুরআন ও নামাজ প্রশিক্ষণ",
+  "পারিবারিক ভিজিটের সুযোগ",
+];
 
-function detectLang(text){if(/[\u0980-\u09FF]/.test(text))return'bn';if(/[\u0600-\u06FF]/.test(text))return'ar';return'en';}
-
-// ── Strings ──
-const S={
-  en:{heroSub:'Enter the Gathering',searchPh:'🔍  Search public rooms...',privateCodePh:'Enter private room code...',joinCode:'Enter',roomsLabel:'✦ Open Gatherings',newRoom:'+ New Room',signin:'Sign In',join:'Join',logout:'Leave',regTitle:'Join the Majlis',regName:'Username',regEmail:'Email',regPass:'Password',regCancel:'Cancel',regBtn:'Join',regDivider:'Already a member?',regSwitch:'Sign In Instead',loginTitle:'Welcome Back',loginEmail:'Email',loginPass:'Password',loginCancel:'Cancel',loginBtn:'Enter',loginDivider:'New here?',loginSwitch:'Create Account',crTitle:'Open a Gathering',crType:'Room Type',crName:'Room Name',crDesc:'Description',crPass:'Password (optional)',crCancel:'Cancel',crBtn:'Open',joinTitle:'Protected Room',joinDesc:'This gathering is password protected.',joinPass:'Password',joinCancel:'Cancel',joinEnter:'Enter',leaveBtn:'← Leave',deleteBtn:'Delete Room',msgPh:'Write your message...',tapTranslate:'Tap to translate',translating:'Translating...',byLabel:'by',msgCount:'messages',yourRoom:'Your Room',emptyRooms:'No gatherings yet. Be the first!',noResults:'No rooms found.',openRoom:'🔓 Open',protectedRoom:'🔒 Protected',privateRoom:'🔐 Private',errFill:'Please fill all fields.',errPass6:'Password must be at least 6 characters.',errWrongPass:'Incorrect password.',errDel:'Delete this room? Cannot be undone.',errImg:'Image must be under 3MB.',errCode:'Invalid or expired room code.',sysEntered:'has entered the gathering',noAccount:'No account found.',wrongPass:'Incorrect email or password.',emailUsed:'Email already registered.',weakPass:'Password is too weak.',rcTitle:'Room Created!',rcMsg:'Your private room is ready.',rcCodeLabel:'Share this code with your guests:',rcWarn:"⚠ Save this code — it won't be shown again.",typePublicHint:'Visible to everyone — optionally password protected.',typePrivateHint:'Hidden room — only accessible via a secret code.'},
-  ar:{heroSub:'ادخل المجلس',searchPh:'🔍  ابحث في المجالس العامة...',privateCodePh:'أدخل كود المجلس الخاص...',joinCode:'دخول',roomsLabel:'✦ المجالس المفتوحة',newRoom:'+ افتح مجلساً',signin:'دخول',join:'تفضل',logout:'خروج',regTitle:'أهلاً وسهلاً',regName:'الاسم',regEmail:'البريد الإلكتروني',regPass:'كلمة المرور',regCancel:'إلغاء',regBtn:'انضم',regDivider:'عضو مسجل؟',regSwitch:'تسجيل الدخول',loginTitle:'مرحباً بعودتك',loginEmail:'البريد الإلكتروني',loginPass:'كلمة المرور',loginCancel:'إلغاء',loginBtn:'دخول',loginDivider:'جديد هنا؟',loginSwitch:'إنشاء حساب',crTitle:'افتح مجلساً',crType:'نوع المجلس',crName:'اسم المجلس',crDesc:'الوصف',crPass:'كلمة مرور (اختياري)',crCancel:'إلغاء',crBtn:'افتح',joinTitle:'مجلس محمي',joinDesc:'هذا المجلس محمي بكلمة مرور.',joinPass:'كلمة المرور',joinCancel:'إلغاء',joinEnter:'تفضل',leaveBtn:'← مغادرة',deleteBtn:'حذف المجلس',msgPh:'اكتب رسالتك هنا...',tapTranslate:'اضغط للترجمة',translating:'جاري الترجمة...',byLabel:'بقلم',msgCount:'أحاديث',yourRoom:'مجلسك',emptyRooms:'لا توجد مجالس بعد. كن أول من يفتح مجلساً!',noResults:'لا توجد مجالس مطابقة.',openRoom:'🔓 مفتوح',protectedRoom:'🔒 محمي',privateRoom:'🔐 خاص',errFill:'يرجى تعبئة جميع الحقول.',errPass6:'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',errWrongPass:'كلمة المرور غير صحيحة.',errDel:'حذف هذا المجلس؟ لا يمكن التراجع.',errImg:'الصورة يجب أن تكون أقل من 3 ميجابايت.',errCode:'كود المجلس غير صحيح أو منتهي.',sysEntered:'دخل المجلس',noAccount:'لا يوجد حساب بهذا البريد.',wrongPass:'بريد أو كلمة مرور خاطئة.',emailUsed:'البريد مسجل مسبقاً.',weakPass:'كلمة المرور ضعيفة جداً.',rcTitle:'تم إنشاء المجلس!',rcMsg:'مجلسك الخاص جاهز.',rcCodeLabel:'شارك هذا الكود مع ضيوفك:',rcWarn:'⚠ احفظ هذا الكود — لن يُعرض مرة أخرى.',typePublicHint:'مرئي للجميع — يمكن تأمينه بكلمة مرور.',typePrivateHint:'مجلس مخفي — يُدخل بكود سري فقط.'}
-};
-const t=k=>S[uiLang][k]||S.en[k]||k;
-
-function applyLang(){
-  document.getElementById('btn-en').classList.toggle('active',uiLang==='en');
-  document.getElementById('btn-ar').classList.toggle('active',uiLang==='ar');
-  set('hero-sub',t('heroSub'));
-  document.getElementById('search-input').placeholder=t('searchPh');
-  document.getElementById('private-code-input').placeholder=t('privateCodePh');
-  set('join-code-btn',t('joinCode'));
-  set('rooms-label',t('roomsLabel'));
-  document.getElementById('msg-input').placeholder=t('msgPh');
-  set('reg-title',t('regTitle'));set('lbl-reg-name',t('regName'));set('lbl-reg-email',t('regEmail'));set('lbl-reg-pass',t('regPass'));set('reg-cancel',t('regCancel'));set('reg-btn',t('regBtn'));set('reg-divider',t('regDivider'));set('reg-switch',t('regSwitch'));
-  set('login-title',t('loginTitle'));set('lbl-login-email',t('loginEmail'));set('lbl-login-pass',t('loginPass'));set('login-cancel',t('loginCancel'));set('login-btn',t('loginBtn'));set('login-divider',t('loginDivider'));set('login-switch',t('loginSwitch'));
-  set('cr-title',t('crTitle'));set('lbl-cr-type',t('crType'));set('lbl-cr-name',t('crName'));set('lbl-cr-desc',t('crDesc'));set('lbl-cr-pass',t('crPass'));set('cr-cancel',t('crCancel'));set('cr-btn',t('crBtn'));
-  document.getElementById('type-btn-public').textContent=`🔓 ${uiLang==='ar'?'عام':'Public'}`;
-  document.getElementById('type-btn-private').textContent=`🔐 ${uiLang==='ar'?'خاص':'Private'}`;
-  setRoomType(newRoomType);
-  set('join-title',t('joinTitle'));set('join-desc',t('joinDesc'));set('lbl-join-pass',t('joinPass'));set('join-cancel',t('joinCancel'));set('join-enter',t('joinEnter'));
-  set('leave-btn',t('leaveBtn'));set('delete-room-btn',t('deleteBtn'));
-  const pt=document.getElementById('prayer-widget-title');if(pt)pt.textContent=uiLang==='ar'?'🕌 مواقيت الصلاة':'🕌 Prayer Times';
-  updateHeaderUI();renderRooms();loadHadith();
-  document.querySelectorAll('.translate-hint').forEach(el=>el.textContent=t('tapTranslate'));
-}
-function setLang(lang){uiLang=lang;applyLang();}
-
-function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
-function v(id){const el=document.getElementById(id);return el?el.value:'';}
-function clearFields(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';})}
-function showError(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.classList.add('show');}}
-function clearErrors(){document.querySelectorAll('.error-msg').forEach(e=>e.classList.remove('show'));}
-function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function escAttr(s){if(!s)return'';return String(s).replace(/'/g,"\\'").replace(/\n/g,' ');}
-function setLoading(id,on){const el=document.getElementById(id);if(!el)return;el.disabled=on;if(on){el.dataset.orig=el.textContent;el.innerHTML=`<span class="spin"></span>`;}else el.textContent=el.dataset.orig||'';}
-function friendlyError(code){const m={'auth/email-already-in-use':t('emailUsed'),'auth/invalid-email':t('errFill'),'auth/weak-password':t('weakPass'),'auth/user-not-found':t('noAccount'),'auth/wrong-password':t('wrongPass'),'auth/invalid-credential':t('wrongPass')};return m[code]||t('wrongPass');}
-
-try{document.getElementById('hijri-date').textContent=new Intl.DateTimeFormat('ar-SA-u-ca-islamic',{day:'numeric',month:'long',year:'numeric'}).format(new Date());}catch(e){}
-
-function navigate(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');}
-
-// Load rooms immediately without waiting for auth
-listenRooms();
-onAuthStateChanged(auth,user=>{currentUser=user||null;updateHeaderUI();});
-
-async function register(){
-  const name=v('reg-username').trim(),email=v('reg-email').trim(),pass=v('reg-password');
-  if(!name||!email||!pass)return showError('reg-error',t('errFill'));
-  if(pass.length<6)return showError('reg-error',t('errPass6'));
-  setLoading('reg-btn',true);
-  try{const cred=await createUserWithEmailAndPassword(auth,email,pass);await updateProfile(cred.user,{displayName:name});currentUser=cred.user;window.hideModal('register');clearFields(['reg-username','reg-email','reg-password']);}
-  catch(e){showError('reg-error',friendlyError(e.code));}
-  setLoading('reg-btn',false);
-}
-
-async function login(){
-  const email=v('login-email').trim(),pass=v('login-password');
-  if(!email||!pass)return showError('login-error',t('errFill'));
-  setLoading('login-btn',true);
-  try{await signInWithEmailAndPassword(auth,email,pass);window.hideModal('login');clearFields(['login-email','login-password']);}
-  catch(e){showError('login-error',friendlyError(e.code));}
-  setLoading('login-btn',false);
-}
-
-function updateHeaderUI(){
-  const el=document.getElementById('header-right'),ha=document.getElementById('hero-actions');
-  if(currentUser){
-    const ini=(currentUser.displayName||currentUser.email).substring(0,2).toUpperCase();
-    el.innerHTML=`<div class="user-badge"><div class="avatar">${ini}</div><span>${escHtml(currentUser.displayName||currentUser.email)}</span></div><button class="btn btn-outline btn-sm" onclick="logout()">${t('logout')}</button>`;
-    ha.innerHTML=`<button class="btn btn-gold" onclick="showModal('create-room')">✦ ${t('newRoom')}</button>`;
-  }else{
-    el.innerHTML=`<button class="btn btn-outline btn-sm" onclick="showModal('login')">${t('signin')}</button><button class="btn btn-gold btn-sm" onclick="showModal('register')">${t('join')}</button>`;
-    ha.innerHTML=`<button class="btn btn-gold" onclick="showModal('register')">✦ ${t('join')}</button><button class="btn btn-outline" onclick="showModal('login')">${t('signin')}</button>`;
-  }
-}
-
-function listenRooms(){
-  if(roomsUnsub)roomsUnsub();
-  // Try with ordering first, fall back to simple collection if index not ready
-  const q=query(collection(db,'rooms'),orderBy('createdAt','desc'));
-  roomsUnsub=onSnapshot(q,snap=>{
-    // Filter public rooms client-side so no composite index is needed
-    allRooms=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>!r.visibility||r.visibility==='public');
-    renderRooms();
-  },err=>{
-    // If orderBy fails too, just get all rooms unordered
-    const q2=query(collection(db,'rooms'));
-    roomsUnsub=onSnapshot(q2,snap=>{
-      allRooms=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>!r.visibility||r.visibility==='public');
-      renderRooms();
-    },()=>{
-      document.getElementById('rooms-grid').innerHTML=`<div class="empty-state"><div class="icon">🕌</div><p>${t('emptyRooms')}</p></div>`;
-    });
-  });
-}
-
-function renderRooms(){
-  const grid=document.getElementById('rooms-grid');
-  const q=(v('search-input')||'').toLowerCase();
-  let arr=q?allRooms.filter(r=>r.name.toLowerCase().includes(q)||(r.desc||'').toLowerCase().includes(q)):allRooms;
-  if(!arr.length){grid.innerHTML=`<div class="empty-state"><div class="icon">🕌</div><p>${q?t('noResults'):t('emptyRooms')}</p></div>`;return;}
-  grid.innerHTML=arr.map(r=>{
-    const isOwner=currentUser&&currentUser.uid===r.ownerId;
-    return`<div class="room-card" onclick="tryEnterRoom('${r.id}')"><div class="room-card-header"><div class="room-name">${escHtml(r.name)}</div><span>${r.password?'🔒':'🔓'}</span></div><div class="room-desc">${escHtml(r.desc||'...')}</div><div class="room-meta"><span class="room-tag">${t('byLabel')} ${escHtml(r.ownerName)}</span><span class="room-tag">${r.msgCount||0} ${t('msgCount')}</span><span class="room-tag">${r.password?t('protectedRoom'):t('openRoom')}</span>${isOwner?`<span class="room-tag" style="border-color:rgba(201,168,76,0.5);color:var(--gold)">${t('yourRoom')}</span>`:''}</div></div>`;
-  }).join('');
-}
-
-async function createRoom(){
-  if(!currentUser)return;
-  const name=v('room-name-input').trim(),desc=v('room-desc-input').trim(),pass=newRoomType==='public'?v('room-pass-input'):'';
-  if(!name)return showError('room-error',t('errFill'));
-  setLoading('cr-btn',true);
-  try{
-    const isPrivate=newRoomType==='private';
-    const code=isPrivate?genCode():null;
-    const ref=await addDoc(collection(db,'rooms'),{name,desc,password:pass,visibility:isPrivate?'private':'public',code,ownerId:currentUser.uid,ownerName:currentUser.displayName||currentUser.email,createdAt:serverTimestamp(),msgCount:0});
-    window.hideModal('create-room');clearFields(['room-name-input','room-desc-input','room-pass-input']);
-    createdRoomId=ref.id;
-    if(isPrivate){set('rc-title',t('rcTitle'));document.getElementById('rc-msg').textContent=t('rcMsg');document.getElementById('rc-code-label').textContent=t('rcCodeLabel');document.getElementById('rc-code').textContent=code;document.getElementById('rc-warn').textContent=t('rcWarn');window.showModal('room-created');}
-    else enterRoom(ref.id);
-  }catch(e){showError('room-error',e.message);}
-  setLoading('cr-btn',false);
-}
-
-function dismissCreated(){window.hideModal('room-created');if(createdRoomId){enterRoom(createdRoomId);createdRoomId=null;}}
-
-async function joinByCode(){
-  if(!currentUser){window.showModal('login');return;}
-  const code=v('private-code-input').trim().toUpperCase();if(!code)return;
-  setLoading('join-code-btn',true);
-  try{
-    // Search all rooms client-side to avoid needing composite index
-    const snap=await getDocs(collection(db,'rooms'));
-    const match=snap.docs.find(d=>{const data=d.data();return data.code===code&&data.visibility==='private';});
-    if(!match){alert(t('errCode'));setLoading('join-code-btn',false);return;}
-    document.getElementById('private-code-input').value='';
-    enterRoom(match.id);
-  }catch(e){alert(t('errCode'));}
-  setLoading('join-code-btn',false);
-}
-
-function tryEnterRoom(id){
-  if(!currentUser){window.showModal('login');return;}
-  const room=allRooms.find(r=>r.id===id);if(!room)return;
-  if(room.password){pendingRoomId=id;window.showModal('join-room');}else enterRoom(id);
-}
-
-function joinRoomWithPassword(){
-  const room=allRooms.find(r=>r.id===pendingRoomId);if(!room)return;
-  if(v('join-pass-input')!==room.password)return showError('join-error',t('errWrongPass'));
-  window.hideModal('join-room');clearFields(['join-pass-input']);enterRoom(pendingRoomId);
-}
-
-function enterRoom(id){
-  currentRoomId=id;lastMsgCount=0;
-  const known=allRooms.find(r=>r.id===id);
-  if(known){setupChat(known);}
-  else{getDoc(doc(db,'rooms',id)).then(d=>{if(d.exists())setupChat({id:d.id,...d.data()});});}
-}
-
-function setupChat(room){
-  currentRoomData=room;
-  document.getElementById('chat-room-name').textContent=room.name;
-  const badge=room.visibility==='private'?t('privateRoom'):(room.password?t('protectedRoom'):t('openRoom'));
-  document.getElementById('chat-room-meta').textContent=(room.desc||'')+`  ${badge}`;
-  document.getElementById('delete-room-btn').style.display=currentUser.uid===room.ownerId?'inline-flex':'none';
-  set('delete-room-btn',t('deleteBtn'));set('leave-btn',t('leaveBtn'));
-  navigate('chat');
-  listenMessages(room.id);
-  joinMemberList(room.id);
-  listenMembers(room.id);
-  // Only post welcome message if this user has never entered this room before
-  const welcomeRef=doc(db,'rooms',room.id,'welcomed',currentUser.uid);
-  const welcomeSnap=await getDoc(welcomeRef);
-  if(!welcomeSnap.exists()){
-    await setDoc(welcomeRef,{at:serverTimestamp()});
-    await addDoc(collection(db,'rooms',room.id,'messages'),{type:'system',text:uiLang==='ar'?`أهلاً وسهلاً بـ ${currentUser.displayName||currentUser.email} في المجلس`:`${currentUser.displayName||currentUser.email} ${t('sysEntered')}`,ts:serverTimestamp()});
-  }
-}
-
-async function leaveRoom(){
-  if(currentRoomId)await leaveMemberList(currentRoomId);
-  if(msgUnsub){msgUnsub();msgUnsub=null;}
-  if(membersUnsub){membersUnsub();membersUnsub=null;}
-  currentRoomId=null;currentRoomData=null;lastMsgCount=0;
-  document.getElementById('messages-area').innerHTML='';
-  document.getElementById('members-list').innerHTML='';
-  navigate('home');
-}
-
-async function deleteRoom(){
-  const roomDoc=await getDoc(doc(db,'rooms',currentRoomId));
-  if(!roomDoc.exists()||roomDoc.data().ownerId!==currentUser.uid)return;
-  if(!confirm(t('errDel')))return;
-  const msgs=await getDocs(collection(db,'rooms',currentRoomId,'messages'));
-  for(const m of msgs.docs)await deleteDoc(m.ref);
-  const mems=await getDocs(collection(db,'rooms',currentRoomId,'members'));
-  for(const m of mems.docs)await deleteDoc(m.ref);
-  await deleteDoc(doc(db,'rooms',currentRoomId));
-  leaveRoom();
-}
-
-function listenMessages(roomId){
-  if(msgUnsub)msgUnsub();
-  let isFirst=true;
-  msgUnsub=onSnapshot(query(collection(db,'rooms',roomId,'messages'),orderBy('ts','asc')),snap=>{
-    const area=document.getElementById('messages-area');
-    const atBottom=area.scrollHeight-area.clientHeight<=area.scrollTop+60;
-    if(!isFirst&&snap.docs.length>lastMsgCount){const newest=snap.docs[snap.docs.length-1].data();if(newest.authorId!==currentUser?.uid)playNotification();}
-    lastMsgCount=snap.docs.length;isFirst=false;
-    area.innerHTML=snap.docs.map(d=>{
-      const m=d.data();
-      if(m.type==='system')return`<div class="msg system"><div class="msg-bubble"><div class="msg-text">${escHtml(m.text)}</div></div></div>`;
-      const isOwn=m.authorId===currentUser?.uid;
-      const ini=(m.author||'?').substring(0,2).toUpperCase();
-      const time=m.ts?new Date(m.ts.toDate()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
-      const imgHtml=m.image?`<img class="msg-img" src="${m.image}" onclick="openLightbox(this.src)">`:''
-      const cached=transCache[d.id];
-      const transHtml=cached?`<div class="msg-translation show">${escHtml(cached)}</div>`:`<div class="msg-translation" id="trans-${d.id}"></div>`;
-      const hint=m.text?`<div class="translate-hint">${t('tapTranslate')}</div>`:'';
-      return`<div class="msg ${isOwn?'own':''}"><div class="msg-avatar"><div class="avatar">${ini}</div></div><div class="msg-bubble" onclick="translateMsg('${d.id}','${escAttr(m.text||'')}')">${isOwn?'':`<div class="msg-author">${escHtml(m.author)}</div>`}${m.text?`<div class="msg-text">${escHtml(m.text)}</div>`:''}${imgHtml}${transHtml}${hint}<div class="msg-time">${time}</div></div></div>`;
-    }).join('');
-    if(atBottom)area.scrollTop=area.scrollHeight;
-    if(currentRoomId===roomId)setDoc(doc(db,'rooms',roomId),{msgCount:snap.size},{merge:true});
-  });
-}
-
-async function translateMsg(msgId,text){
-  if(!text||!text.trim())return;
-  const el=document.getElementById('trans-'+msgId);if(!el)return;
-  if(el.classList.contains('show')){el.classList.remove('show');return;}
-  if(transCache[msgId]){el.textContent=transCache[msgId];el.classList.add('show');return;}
-  const lang=detectLang(text);const pair=lang==='ar'?'ar|en':`${lang}|ar`;
-  el.innerHTML=`<span class="spin"></span>${t('translating')}`;el.classList.add('show');
-  try{
-    const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${pair}`);
-    const data=await res.json();const result=data.responseData?.translatedText;
-    if(result&&result!==text){transCache[msgId]=result;el.textContent=result;}
-    else el.textContent=lang==='ar'?'Translation unavailable':'الترجمة غير متاحة';
-  }catch(e){el.textContent=lang==='ar'?'Translation failed':'فشل الترجمة';}
-}
-
-async function sendMessage(){
-  const text=document.getElementById('msg-input').value.trim(),img=imageData;
-  if(!text&&!img)return;if(!currentUser||!currentRoomId)return;
-  // check if muted
-  try{const memDoc=await getDoc(doc(db,'rooms',currentRoomId,'members',currentUser.uid));if(memDoc.exists()&&memDoc.data().muted){alert(uiLang==='ar'?'أنت مكتوم في هذا المجلس':'You are muted in this room.');return;}}catch(e){}
-  document.getElementById('msg-input').value='';document.getElementById('msg-input').style.height='auto';clearImagePreview();
-  await addDoc(collection(db,'rooms',currentRoomId,'messages'),{type:'user',author:currentUser.displayName||currentUser.email,authorId:currentUser.uid,text:text||'',image:img||null,ts:serverTimestamp()});
-}
-
-function handleImageSelect(e){
-  const file=e.target.files[0];if(!file)return;
-  if(file.size>3*1024*1024){alert(t('errImg'));return;}
-  const reader=new FileReader();
-  reader.onload=ev=>{imageData=ev.target.result;document.getElementById('img-preview-thumb').src=ev.target.result;document.getElementById('img-preview-wrap').classList.add('show');};
-  reader.readAsDataURL(file);e.target.value='';
-}
-function clearImagePreview(){imageData=null;document.getElementById('img-preview-wrap').classList.remove('show');document.getElementById('img-preview-thumb').src='';}
-
-document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hidden');}));
-document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-document.getElementById('join-pass-input').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoomWithPassword();});
-document.getElementById('private-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')joinByCode();});
-
-applyLang();
-loadPrayerTimes();
-</script>
-</body>
-</html>
+const testimonials = [
+  {
+    name: "মোঃ আব্দুল্লাহ",
+    quote: "রাহবার কেন্দ্রে ভর্তি হওয়ার পর থেকে আমার জীবন সম্পূর্ণ বদলে গেছে। ডাক্তার এবং কাউন্সেলরদের অক্লান্ত পরিশ্রম আমাকে নতুন জীবন দিয়েছে। আলহামদুলিল্লাহ, আজ আমি সম্পূর্ণ সুস্থ।",
+    location: "মিরপুর, ঢাকা",
+    date: "মার্চ ২০২৫",
+  },
+  {
+    name: "রাফিয়া বেগম (মা)",
+    quote: "আমার ছেলেকে নিয়ে সম্পূর্ণ হতাশ ছিলাম। রাহবারের ইসলামিক পদ্ধতি এবং পেশাদার চিকিৎসা আমার পরিবারকে ফিরিয়ে দিয়েছে। এই কেন্দ্রকে সারাজীবন মনে রাখব।",
+    location: "নারায়ণগঞ্জ",
+    date: "জানুয়ারি ২০২৫",
+  },
+  {
+    name: "কামরুল হাসান",
+    quote: "৮ বছরের নেশার জীবন থেকে মুক্তি পেয়েছি এখানে। কুরআনের আলো এবং বিশেষজ্ঞ চিকিৎসার সমন্বয় সত্যিই অলৌকিক।",
+    location: "চট্টগ্রাম",
+    date: "নভেম্বর ২০২৪",
+  },
+];
